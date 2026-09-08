@@ -198,26 +198,26 @@ export const B2BOrderFlowView: React.FC = () => {
         </div>
 
         {/* 3 Step Indicator */}
-        <div className="flex items-center gap-2 text-xs font-bold">
-          <div className="flex items-center gap-1.5 bg-[#FFF1F2] border border-red-200 text-[#E31B23] px-3 py-1.5 rounded-xl">
-            <span className="w-5 h-5 rounded-full bg-[#E31B23] text-white flex items-center justify-center text-[11px]">
+        <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-bold overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+          <div className="flex items-center gap-1.5 bg-[#FFF1F2] border border-red-200 text-[#E31B23] px-2.5 py-1.5 rounded-xl shrink-0">
+            <span className="w-5 h-5 rounded-full bg-[#E31B23] text-white flex items-center justify-center text-[11px] shrink-0">
               1
             </span>
-            <span>Select Product</span>
+            <span className="whitespace-nowrap">Select Product</span>
           </div>
-          <span className="text-slate-400">→</span>
-          <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-xl">
-            <span className="w-5 h-5 rounded-full bg-slate-800 text-white flex items-center justify-center text-[11px]">
+          <span className="text-slate-400 shrink-0">→</span>
+          <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 px-2.5 py-1.5 rounded-xl shrink-0">
+            <span className="w-5 h-5 rounded-full bg-slate-800 text-white flex items-center justify-center text-[11px] shrink-0">
               2
             </span>
-            <span>Enter Quantity</span>
+            <span className="whitespace-nowrap">Enter Quantity</span>
           </div>
-          <span className="text-slate-400">→</span>
-          <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-xl">
-            <span className="w-5 h-5 rounded-full bg-[#E31B23] text-white flex items-center justify-center text-[11px]">
+          <span className="text-slate-400 shrink-0">→</span>
+          <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 px-2.5 py-1.5 rounded-xl shrink-0">
+            <span className="w-5 h-5 rounded-full bg-[#E31B23] text-white flex items-center justify-center text-[11px] shrink-0">
               3
             </span>
-            <span>Place Order</span>
+            <span className="whitespace-nowrap">Place Order</span>
           </div>
         </div>
       </div>

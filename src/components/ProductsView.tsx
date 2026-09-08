@@ -16,6 +16,7 @@ import {
 import { useStore } from '../context/StoreContext';
 import { Product } from '../types';
 import { ProductImage } from './ProductImage';
+import { getTypesForCategory } from '../data/productTypes';
 
 interface ProductsViewProps {
   onOpenAddProductModal: () => void;
@@ -57,6 +58,9 @@ export const ProductsView: React.FC<ProductsViewProps> = ({
     setEditFormData({
       name: prod.name,
       category: prod.category,
+      productType: prod.productType || '',
+      brand: prod.brand,
+      image: prod.image || '',
       retailPrice: prod.retailPrice,
       b2bPrice: prod.b2bPrice,
       minStockLevel: prod.minStockLevel,
@@ -83,8 +87,22 @@ export const ProductsView: React.FC<ProductsViewProps> = ({
     updateProduct(editingProduct.id, {
       ...editFormData,
       category: finalCategory,
+      productType: editFormData.productType || editingProduct.productType,
+      image: editFormData.image !== undefined ? editFormData.image : editingProduct.image,
     });
     setEditingProduct(null);
+  };
+
+  const handleEditFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setEditFormData((prev) => ({ ...prev, image: result }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -490,6 +508,58 @@ export const ProductsView: React.FC<ProductsViewProps> = ({
                   )}
                 </div>
               )}
+
+              {/* Product Type / Subcategory Edit */}
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Product Type / Subcategory</label>
+                <input
+                  type="text"
+                  value={editFormData.productType || ''}
+                  onChange={(e) => setEditFormData({ ...editFormData, productType: e.target.value })}
+                  placeholder="e.g. English Willow Bat, Plastic Bat, Tennis Ball"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-[#E31B23] focus:outline-none text-xs"
+                />
+              </div>
+
+              {/* Product Image Management */}
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-slate-700">Product Image</label>
+                  {editFormData.image && (
+                    <button
+                      type="button"
+                      onClick={() => setEditFormData((prev) => ({ ...prev, image: '' }))}
+                      className="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer"
+                    >
+                      Remove Image
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-white border border-slate-200 p-1 shrink-0 overflow-hidden shadow-2xs">
+                    <ProductImage
+                      src={editFormData.image}
+                      category={editFormData.category}
+                      name={editFormData.name}
+                    />
+                  </div>
+                  <div className="flex-1 space-y-1.5 min-w-0">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleEditFileUpload}
+                      className="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-[#E31B23] file:text-white hover:file:bg-[#B5121B] cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={editFormData.image || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, image: e.target.value })}
+                      placeholder="Or paste image URL (https://...)"
+                      className="w-full px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-[11px] font-medium focus:ring-1 focus:ring-[#E31B23] focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>

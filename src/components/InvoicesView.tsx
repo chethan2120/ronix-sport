@@ -100,13 +100,14 @@ export const InvoicesView: React.FC = () => {
   });
 
   const calculatedItems: OrderItem[] = items.map((it) => {
+    const prod = products.find((p) => p.id === it.productId);
     const itemSubtotal = it.price * it.quantity;
     const gstAmt = (itemSubtotal * it.gstPercent) / 100;
     return {
       productId: it.productId,
       productName: it.productName,
       sku: it.sku,
-      image: (it as any).image || '',
+      image: prod?.image || (it as any).image || '',
       price: it.price,
       quantity: it.quantity,
       subtotal: itemSubtotal,

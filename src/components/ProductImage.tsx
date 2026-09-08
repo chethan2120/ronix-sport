@@ -10,8 +10,10 @@ import {
   Dumbbell,
   Backpack,
   Zap,
+  Footprints,
 } from 'lucide-react';
 import { Product } from '../types';
+import { getSkuProductAsset } from '../data/productAssets';
 
 interface ProductImageProps {
   src?: string;
@@ -26,14 +28,14 @@ interface ProductImageProps {
 
 const getCategoryDetails = (category?: string, name?: string) => {
   const text = `${category || ''} ${name || ''}`.toLowerCase();
-  
+
   if (text.includes('bat') || text.includes('willow') || text.includes('cricket bat')) {
     return { icon: Trophy, label: 'Cricket Bat', bg: 'from-amber-50 to-orange-100', color: 'text-amber-800' };
   }
   if (text.includes('ball') || text.includes('tennis ball') || text.includes('leather ball')) {
     return { icon: Circle, label: 'Match Ball', bg: 'from-red-50 to-rose-100', color: 'text-rose-800' };
   }
-  if (text.includes('helm') || text.includes('headguard')) {
+  if (text.includes('helm') || text.includes('headguard') || text.includes('protection')) {
     return { icon: Shield, label: 'Protective Helmet', bg: 'from-blue-50 to-indigo-100', color: 'text-blue-800' };
   }
   if (text.includes('glove') || text.includes('mitt')) {
@@ -41,6 +43,9 @@ const getCategoryDetails = (category?: string, name?: string) => {
   }
   if (text.includes('pad') || text.includes('guard') || text.includes('legguard')) {
     return { icon: Layers, label: 'Leg Guards', bg: 'from-purple-50 to-violet-100', color: 'text-purple-800' };
+  }
+  if (text.includes('shoe') || text.includes('footwear') || text.includes('stud')) {
+    return { icon: Footprints, label: 'Sports Footwear', bg: 'from-red-50 to-amber-100', color: 'text-red-800' };
   }
   if (text.includes('football') || text.includes('soccer')) {
     return { icon: Activity, label: 'Match Football', bg: 'from-sky-50 to-blue-100', color: 'text-sky-800' };
@@ -68,9 +73,27 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   category,
   name,
   product,
-  size = 'custom',
 }) => {
-  const imageSrc = src || product?.image;
+  // Comprehensive field resolution to handle any property naming structure
+  const rawSrc =
+    src ||
+    product?.image ||
+    (product as any)?.imageUrl ||
+    (product as any)?.image_url ||
+    (product as any)?.productImage ||
+    (product as any)?.thumbnail ||
+    (product as any)?.photo;
+
+  const sku = product?.sku || (product as any)?.SKU;
+  const skuAsset = sku ? getSkuProductAsset(sku) : null;
+
+  // User-uploaded images (Base64 data URLs or custom URLs) take #1 priority.
+  // Legacy unsplash URLs or missing images resolve to exact SKU product asset or fallback icon.
+  const isCustomUserImage = Boolean(rawSrc && !rawSrc.includes('unsplash.com'));
+  const imageSrc = isCustomUserImage
+    ? rawSrc
+    : (skuAsset || (rawSrc && !rawSrc.includes('unsplash.com') ? rawSrc : null));
+
   const imageAlt = alt || product?.name || 'Ronix Sports Equipment';
   const prodCat = category || product?.category || '';
   const prodName = name || product?.name || '';
@@ -78,7 +101,7 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Reset states if image source changes
+  // Reset error/loading states whenever imageSrc changes
   useEffect(() => {
     setHasError(false);
     setIsLoaded(false);
@@ -87,7 +110,7 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   const catDetails = getCategoryDetails(prodCat, prodName);
   const Icon = catDetails.icon;
 
-  // Fallback card if image fails or missing
+  // Category-based Fallback view when no valid product image is available
   if (!imageSrc || hasError) {
     return (
       <div
@@ -110,7 +133,7 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   }
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-xl bg-white">
+    <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-xl bg-white p-1">
       {!isLoaded && (
         <div className="absolute inset-0 bg-slate-50 animate-pulse flex items-center justify-center rounded-xl">
           <Package className="w-5 h-5 text-slate-300" />
@@ -122,7 +145,6 @@ export const ProductImage: React.FC<ProductImageProps> = ({
         className={`${className} ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-200`}
         onError={() => setHasError(true)}
         onLoad={() => setIsLoaded(true)}
-        referrerPolicy="no-referrer"
         loading="lazy"
       />
     </div>

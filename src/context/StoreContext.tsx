@@ -32,6 +32,7 @@ import {
   INITIAL_AUDIT_LOGS,
   INITIAL_NOTIFICATIONS,
 } from '../data/initialData';
+import { getSkuProductAsset } from '../data/productAssets';
 
 // Demo Tracking Sets to identify initial sample/demo records reliably
 export const DEMO_PRODUCT_IDS = new Set(INITIAL_PRODUCTS.map((p) => p.id));
@@ -241,7 +242,14 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Primary Entities with local storage sync
   const [products, setProducts] = useState<Product[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_products`);
-    return saved ? JSON.parse(saved) : tagWithDemo(INITIAL_PRODUCTS);
+    const loaded: Product[] = saved ? JSON.parse(saved) : tagWithDemo(INITIAL_PRODUCTS);
+    return loaded.map((p) => {
+      const asset = getSkuProductAsset(p.sku);
+      if (asset && (!p.image || p.image.includes('unsplash.com'))) {
+        return { ...p, image: asset };
+      }
+      return p;
+    });
   });
 
   // Custom categories with local storage sync

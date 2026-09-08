@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { ProductImage } from './ProductImage';
+import { getTypesForCategory } from '../data/productTypes';
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -24,15 +25,18 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
   const { addProduct, categories = [], addCategory } = useStore();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload');
-  const [imagePreview, setImagePreview] = useState<string>('https://images.unsplash.com/photo-1531415074868-036b1c57e3ce?w=400&auto=format&fit=crop&q=80');
+  const [imagePreview, setImagePreview] = useState<string>('');
 
   const [newCategoryName, setNewCategoryName] = useState<string>('');
   const [categoryError, setCategoryError] = useState<string>('');
 
+  const [selectedProductType, setSelectedProductType] = useState<string>('');
+  const [customProductType, setCustomProductType] = useState<string>('');
+
   const [formData, setFormData] = useState({
     name: '',
     sku: '',
-    category: categories[0] || 'Cricket Bats',
+    category: categories[0] || 'Bats',
     brand: 'Ronix Sports',
     description: '',
     costPrice: 1500,
@@ -40,10 +44,12 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
     b2bPrice: 2050,
     minStockLevel: 20,
     initialStock: 100,
-    image: 'https://images.unsplash.com/photo-1531415074868-036b1c57e3ce?w=400&auto=format&fit=crop&q=80',
+    image: '',
   });
 
   if (!isOpen) return null;
+
+  const availableProductTypes = getTypesForCategory(formData.category);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -89,10 +95,19 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
       finalCategory = addCategory(trimmedCat);
     }
 
+    let finalProductType = selectedProductType;
+    if (selectedProductType === 'Others') {
+      finalProductType = customProductType.trim();
+    }
+    if (!finalProductType && availableProductTypes.length > 0) {
+      finalProductType = availableProductTypes[0];
+    }
+
     addProduct({
       name: formData.name,
       sku: formData.sku.toUpperCase(),
       category: finalCategory,
+      productType: finalProductType || 'Standard',
       brand: formData.brand,
       description: formData.description || `${formData.name} by ${formData.brand}`,
       costPrice: Number(formData.costPrice),
@@ -105,8 +120,10 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
       status: 'Active',
     }, Number(formData.initialStock));
 
-    // Reset local custom category state
+    // Reset local custom category & product type state
     setNewCategoryName('');
+    setSelectedProductType('');
+    setCustomProductType('');
     setCategoryError('');
     onClose();
   };
@@ -137,7 +154,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="font-bold text-slate-700 block mb-1">SKU Code</label>
               <input
@@ -206,6 +223,42 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
                   <span>{categoryError}</span>
                 </p>
               )}
+            </div>
+          )}
+
+          {/* Product Type / Subcategory Dropdown */}
+          <div>
+            <label className="font-bold text-slate-700 block mb-1">
+              Product Type / Subcategory
+            </label>
+            <select
+              value={selectedProductType}
+              onChange={(e) => setSelectedProductType(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-[#E31B23]"
+            >
+              <option value="">Default ({availableProductTypes[0] || 'Standard'})</option>
+              {availableProductTypes.map((pt) => (
+                <option key={pt} value={pt}>
+                  {pt}
+                </option>
+              ))}
+              <option value="Others">+ Add Custom Product Type</option>
+            </select>
+          </div>
+
+          {selectedProductType === 'Others' && (
+            <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-xl space-y-1 animate-in fade-in duration-150">
+              <label className="font-bold text-slate-800 block text-xs flex items-center gap-1">
+                <span>New Product Type Name</span>
+                <span className="text-[#E31B23]">*</span>
+              </label>
+              <input
+                type="text"
+                value={customProductType}
+                onChange={(e) => setCustomProductType(e.target.value)}
+                placeholder="e.g. Plastic Bat, Rubber Ball, Running Shoes"
+                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl font-medium text-xs focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
+              />
             </div>
           )}
 
@@ -284,7 +337,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="font-bold text-slate-700 block mb-1">Cost (₹)</label>
               <input
@@ -314,7 +367,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="font-bold text-slate-700 block mb-1">Initial Stock (Units)</label>
               <input
@@ -429,7 +482,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="font-bold text-slate-700 block mb-1">Payment Method</label>
               <select

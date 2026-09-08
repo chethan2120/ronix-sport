@@ -89,39 +89,39 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="grid grid-cols-12 gap-4 animate-in fade-in duration-200">
       {/* 1. TOP 5 BENTO KPI CARDS */}
-      <div className="col-span-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="col-span-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {/* Card 1: Inventory Value */}
         <div className="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between hover:border-red-200 transition-colors">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">LIVE INVENTORY VALUE</p>
-          <p className="text-xl font-black text-[#E31B23] mt-1">₹ {totalInventoryValue.toLocaleString('en-IN')}</p>
+          <p className="text-lg sm:text-xl font-black text-[#E31B23] mt-1">₹ {totalInventoryValue.toLocaleString('en-IN')}</p>
           <p className="text-[10px] text-emerald-600 font-bold mt-1">{products.length} catalog items</p>
         </div>
 
         {/* Card 2: B2B Orders */}
         <div className="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between hover:border-red-200 transition-colors">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">B2B ORDERS</p>
-          <p className="text-xl font-black text-[#111827] mt-1">{b2bOrders.length}</p>
+          <p className="text-lg sm:text-xl font-black text-[#111827] mt-1">{b2bOrders.length}</p>
           <p className="text-[10px] text-slate-500 font-medium mt-1">Institutional orders</p>
         </div>
 
         {/* Card 3: B2C Sales */}
         <div className="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between hover:border-red-200 transition-colors">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">B2C SALES</p>
-          <p className="text-xl font-black text-emerald-600 mt-1">₹ {totalB2CRevenue.toLocaleString('en-IN')}</p>
+          <p className="text-lg sm:text-xl font-black text-emerald-600 mt-1">₹ {totalB2CRevenue.toLocaleString('en-IN')}</p>
           <p className="text-[10px] text-slate-500 font-medium mt-1">{b2cSales.length} transactions</p>
         </div>
 
         {/* Card 4: Revenue */}
         <div className="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-xs border-l-4 border-l-[#E31B23] flex flex-col justify-between">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">REVENUE</p>
-          <p className="text-xl font-black text-[#111827] mt-1">₹ {grandTotalRevenue.toLocaleString('en-IN')}</p>
+          <p className="text-lg sm:text-xl font-black text-[#111827] mt-1">₹ {grandTotalRevenue.toLocaleString('en-IN')}</p>
           <p className="text-[10px] text-emerald-600 font-bold mt-1">Combined sales total</p>
         </div>
 
         {/* Card 5: Pending Payments */}
-        <div className="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-xs border-l-4 border-l-[#DC2626] flex flex-col justify-between">
+        <div className="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-xs border-l-4 border-l-[#DC2626] flex flex-col justify-between col-span-2 sm:col-span-1">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">PENDING PAYMENTS</p>
-          <p className="text-xl font-black text-[#DC2626] mt-1">₹ {pendingPaymentsAmount.toLocaleString('en-IN')}</p>
+          <p className="text-lg sm:text-xl font-black text-[#DC2626] mt-1">₹ {pendingPaymentsAmount.toLocaleString('en-IN')}</p>
           <p className="text-[10px] text-slate-500 font-medium mt-1">From {pendingInstitutionsCount} accounts</p>
         </div>
       </div>

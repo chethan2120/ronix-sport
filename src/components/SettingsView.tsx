@@ -18,8 +18,17 @@ import {
   Store,
   Receipt,
   RotateCcw,
+  UserPlus,
+  Users,
+  Key,
+  UserX,
+  UserCheck,
+  ShieldCheck,
+  Package,
 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
+import { useAuth } from '../context/AuthContext';
+import { AppRole, UserProfile } from '../types';
 
 export const SettingsView: React.FC = () => {
   const {
@@ -34,9 +43,17 @@ export const SettingsView: React.FC = () => {
     b2cSales,
     payments,
     auditLogs,
-    currentUser,
     currentWarehouse,
   } = useStore();
+
+  const {
+    profile: currentUserProfile,
+    allProfiles,
+    adminCreateStaffUser,
+    adminUpdateUser,
+    adminResetUserPassword,
+    adminToggleUserStatus,
+  } = useAuth();
 
   const [companyName, setCompanyName] = useState('Ronix Sports Pvt Ltd');
   const [gstin, setGstin] = useState('29AABCR8842K1Z9');
@@ -47,6 +64,20 @@ export const SettingsView: React.FC = () => {
   const [thermalPaperWidth, setThermalPaperWidth] = useState<'80mm' | '58mm'>('80mm');
   const [isSavedNotice, setIsSavedNotice] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
+
+  // User Management Modal States
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [newFullName, setNewFullName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newRole, setNewRole] = useState<AppRole>('stock');
+  const [newTempPassword, setNewTempPassword] = useState('');
+  const [userActionError, setUserActionError] = useState<string | null>(null);
+  const [userActionSuccess, setUserActionSuccess] = useState<string | null>(null);
+  const [userActionLoading, setUserActionLoading] = useState(false);
+
+  // Password Reset Modal State for Admin
+  const [resetTargetUser, setResetTargetUser] = useState<UserProfile | null>(null);
+  const [adminNewPassword, setAdminNewPassword] = useState('');
 
   const handleSaveCompany = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,6 +131,68 @@ export const SettingsView: React.FC = () => {
     setResetConfirmOpen(false);
   };
 
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUserActionError(null);
+    setUserActionSuccess(null);
+    setUserActionLoading(true);
+
+    const res = await adminCreateStaffUser({
+      fullName: newFullName,
+      email: newEmail,
+      role: newRole,
+      tempPassword: newTempPassword,
+    });
+
+    setUserActionLoading(false);
+
+    if (res.success) {
+      setUserActionSuccess(`User ${newFullName} (${newEmail}) created successfully.`);
+      setNewFullName('');
+      setNewEmail('');
+      setNewRole('stock');
+      setNewTempPassword('');
+      setTimeout(() => {
+        setUserActionSuccess(null);
+        setIsAddUserOpen(false);
+      }, 1500);
+    } else {
+      setUserActionError(res.error || 'Failed to create user.');
+    }
+  };
+
+  const handleToggleRole = async (u: UserProfile) => {
+    const targetRole: AppRole = u.role === 'admin' ? 'stock' : 'admin';
+    const res = await adminUpdateUser(u.id, { role: targetRole });
+    if (!res.success) {
+      alert(res.error || 'Failed to change user role');
+    }
+  };
+
+  const handleToggleStatus = async (u: UserProfile) => {
+    const res = await adminToggleUserStatus(u.id);
+    if (!res.success) {
+      alert(res.error || 'Failed to update user status');
+    }
+  };
+
+  const handleAdminResetPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetTargetUser) return;
+    setUserActionLoading(true);
+    const res = await adminResetUserPassword(resetTargetUser.id, adminNewPassword);
+    setUserActionLoading(false);
+    if (res.success) {
+      alert(`Password for ${resetTargetUser.email} has been updated.`);
+      setResetTargetUser(null);
+      setAdminNewPassword('');
+    } else {
+      alert(res.error || 'Failed to reset password');
+    }
+  };
+
+  const isAdmin = currentUserProfile?.role === 'admin';
+
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Header */}
@@ -110,7 +203,7 @@ export const SettingsView: React.FC = () => {
             <span>SYSTEM SETTINGS & ERP CONFIGURATION</span>
           </h2>
           <p className="text-xs text-[#6B7280] mt-0.5">
-            Manage demo data visibility, business profile, GST details, thermal printing, and data backups.
+            Manage demo data visibility, business profile, GST details, user accounts, and data backups.
           </p>
         </div>
 
@@ -122,7 +215,149 @@ export const SettingsView: React.FC = () => {
         )}
       </div>
 
-      {/* SECTION 1: DEMO MODE & DATA PROTECTION (Prominent Control) */}
+      {/* SECTION 1: USER MANAGEMENT & ROLES (ADMIN ONLY) */}
+      {isAdmin && (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-[#E31B23]">
+                <Users className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                  <span>USER MANAGEMENT & ACCESS ROLES</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-[#E31B23] border border-red-200">
+                    ADMIN CONTROL
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Create and manage staff logins, assign permissions (Admin vs Stock Staff), and control account status.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsAddUserOpen(true)}
+              className="px-4 py-2 bg-[#E31B23] hover:bg-[#B5121B] text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-xs shrink-0"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>+ Add User</span>
+            </button>
+          </div>
+
+          {/* Users Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-100/70 text-slate-700 font-bold border-b border-slate-200">
+                <tr>
+                  <th className="p-3.5 pl-5">User</th>
+                  <th className="p-3.5">Role</th>
+                  <th className="p-3.5">Status</th>
+                  <th className="p-3.5">Last Login</th>
+                  <th className="p-3.5 text-right pr-5">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {allProfiles.map((u) => (
+                  <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="p-3.5 pl-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs shrink-0">
+                          {u.full_name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .slice(0, 2)
+                            .toUpperCase()}
+                        </div>
+                        <div>
+                          <span className="font-bold text-slate-900 block">{u.full_name}</span>
+                          <span className="text-[11px] text-slate-500 font-mono">{u.email}</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="p-3.5">
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                          u.role === 'admin'
+                            ? 'bg-red-50 text-[#E31B23] border-red-200'
+                            : u.role === 'stock'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200'
+                            : 'bg-sky-50 text-sky-800 border-sky-200'
+                        }`}
+                      >
+                        {u.role === 'admin' ? (
+                          <ShieldCheck className="w-3 h-3 text-[#E31B23]" />
+                        ) : u.role === 'stock' ? (
+                          <Package className="w-3 h-3 text-amber-600" />
+                        ) : (
+                          <Users className="w-3 h-3 text-sky-600" />
+                        )}
+                        <span className="uppercase">{u.role === 'stock' ? 'Stock Staff' : u.role}</span>
+                      </span>
+                    </td>
+
+                    <td className="p-3.5">
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                          u.status === 'Active'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-slate-100 text-slate-500 border border-slate-200'
+                        }`}
+                      >
+                        {u.status}
+                      </span>
+                    </td>
+
+                    <td className="p-3.5 text-slate-500 font-mono text-[11px]">
+                      {u.last_login ? new Date(u.last_login).toLocaleDateString() : 'Never'}
+                    </td>
+
+                    <td className="p-3.5 text-right pr-5 space-x-1.5">
+                      {/* Change Role Button */}
+                      {u.email !== 'admin@gmail.com' && u.role !== 'customer' && (
+                        <button
+                          onClick={() => handleToggleRole(u)}
+                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-bold transition-colors cursor-pointer"
+                          title="Switch role between Admin & Stock Staff"
+                        >
+                          Change Role
+                        </button>
+                      )}
+
+                      {/* Reset Password Button */}
+                      <button
+                        onClick={() => setResetTargetUser(u)}
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-amber-50 hover:text-amber-700 text-slate-700 rounded-lg text-[11px] font-bold transition-colors cursor-pointer"
+                        title="Admin Reset Password"
+                      >
+                        Reset Pass
+                      </button>
+
+                      {/* Deactivate/Activate Button */}
+                      {u.email !== 'admin@gmail.com' && (
+                        <button
+                          onClick={() => handleToggleStatus(u)}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
+                            u.status === 'Active'
+                              ? 'bg-slate-100 hover:bg-red-50 hover:text-[#E31B23] text-slate-700'
+                              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'
+                          }`}
+                        >
+                          {u.status === 'Active' ? 'Deactivate' : 'Activate'}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 2: DEMO MODE & DATA PROTECTION */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
           <div className="flex items-center gap-3">
@@ -207,7 +442,7 @@ export const SettingsView: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 2: COMPANY PROFILE & GST DETAILS */}
+      {/* SECTION 3: COMPANY PROFILE & GST DETAILS */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div className="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
@@ -356,7 +591,7 @@ export const SettingsView: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 3: DATABASE BACKUP & PERSISTENCE SUMMARY */}
+      {/* SECTION 4: DATABASE BACKUP & PERSISTENCE SUMMARY */}
       <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
@@ -402,12 +637,169 @@ export const SettingsView: React.FC = () => {
             <span className="text-base font-black text-slate-900">{payments.length}</span>
           </div>
         </div>
-
-        <div className="text-[11px] text-slate-400 font-mono flex items-center justify-between pt-1">
-          <span>Storage Engine: localStorage (`ronix_sports_crm_db_v1`)</span>
-          <span>Active Staff: {currentUser?.name} ({currentUser?.role})</span>
-        </div>
       </div>
+
+      {/* ADMIN ADD USER MODAL */}
+      {isAddUserOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-[#E31B23]" />
+                <h3 className="font-black text-slate-900 text-sm">Create Staff User Account</h3>
+              </div>
+              <button
+                onClick={() => {
+                  setIsAddUserOpen(false);
+                  setUserActionError(null);
+                  setUserActionSuccess(null);
+                }}
+                className="text-slate-400 hover:text-slate-600 font-bold text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            {userActionError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-[#E31B23] shrink-0" />
+                <span>{userActionError}</span>
+              </div>
+            )}
+
+            {userActionSuccess && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{userActionSuccess}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleCreateUser} className="space-y-3 text-xs">
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={newFullName}
+                  onChange={(e) => setNewFullName(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
+                  placeholder="Ravi Kumar"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
+                  placeholder="ravi@ronixsports.com"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Role Permission</label>
+                <select
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value as AppRole)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
+                >
+                  <option value="stock">Stock / Inventory Staff (Inventory Only)</option>
+                  <option value="admin">Admin (Full CRM Access)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Temporary Password</label>
+                <input
+                  type="text"
+                  required
+                  value={newTempPassword}
+                  onChange={(e) => setNewTempPassword(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-900 focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
+                  placeholder="demo123"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddUserOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={userActionLoading}
+                  className="px-4 py-2 bg-[#E31B23] hover:bg-[#B5121B] text-white font-bold rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  {userActionLoading ? 'Creating...' : 'Create User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN RESET USER PASSWORD MODAL */}
+      {resetTargetUser && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Key className="w-5 h-5 text-[#E31B23]" />
+                <h3 className="font-black text-slate-900 text-sm">
+                  Reset Password for {resetTargetUser.full_name}
+                </h3>
+              </div>
+              <button
+                onClick={() => setResetTargetUser(null)}
+                className="text-slate-400 hover:text-slate-600 font-bold text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAdminResetPasswordSubmit} className="space-y-3 text-xs">
+              <p className="text-slate-600">
+                Set a new password for user account <strong className="text-slate-900">{resetTargetUser.email}</strong>:
+              </p>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">New Password</label>
+                <input
+                  type="password"
+                  required
+                  value={adminNewPassword}
+                  onChange={(e) => setAdminNewPassword(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
+                  placeholder="Enter new password (min 6 chars)"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setResetTargetUser(null)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={userActionLoading}
+                  className="px-4 py-2 bg-[#E31B23] hover:bg-[#B5121B] text-white font-bold rounded-xl shadow-xs cursor-pointer"
+                >
+                  {userActionLoading ? 'Saving...' : 'Set Password'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Confirmation Modal for Reset Demo Data */}
       {resetConfirmOpen && (

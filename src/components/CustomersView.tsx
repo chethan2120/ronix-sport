@@ -110,9 +110,9 @@ export const CustomersView: React.FC = () => {
       {/* Header */}
       <div className="bg-white text-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-black tracking-tight text-[#111827] flex items-center gap-2">
-            <Users className="w-5 h-5 text-[#E31B23]" />
-            <span>CUSTOMERS & INSTITUTION DIRECTORY</span>
+          <h2 className="text-base sm:text-lg font-black tracking-tight text-[#111827] flex items-center gap-2">
+            <Users className="w-5 h-5 text-[#E31B23] shrink-0" />
+            <span className="truncate">CUSTOMERS & INSTITUTION DIRECTORY</span>
           </h2>
           <p className="text-xs text-[#6B7280] mt-0.5">
             Manage institutional client contracts, price tier assignments, and credit limits.
@@ -121,7 +121,7 @@ export const CustomersView: React.FC = () => {
 
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="px-4 py-2.5 bg-[#E31B23] hover:bg-[#B5121B] text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-2 self-start sm:self-auto cursor-pointer"
+          className="w-full sm:w-auto px-4 py-2.5 bg-[#E31B23] hover:bg-[#B5121B] text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 shrink-0 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Add Institution / Customer</span>
@@ -130,12 +130,12 @@ export const CustomersView: React.FC = () => {
 
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           {(['ALL', 'B2B', 'B2C'] as const).map((type) => (
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 filterType === type
                   ? 'bg-[#E31B23] text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-[#FFF1F2] hover:text-[#E31B23]'
@@ -146,7 +146,7 @@ export const CustomersView: React.FC = () => {
           ))}
         </div>
 
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
             type="text"
@@ -266,7 +266,7 @@ export const CustomersView: React.FC = () => {
             </div>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-3 gap-3 my-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
               <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
                 <span className="text-[11px] text-slate-500 font-medium block">Credit Limit</span>
                 <span className="text-sm font-black text-slate-900">
@@ -288,7 +288,7 @@ export const CustomersView: React.FC = () => {
             </div>
 
             {/* Contact & Address Details */}
-            <div className="grid grid-cols-2 gap-4 text-xs bg-slate-50/50 p-4 rounded-2xl border border-slate-100 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-slate-50/50 p-4 rounded-2xl border border-slate-100 mb-4">
               <div>
                 <span className="font-bold text-slate-700 block mb-1">Primary Contact</span>
                 <p className="text-slate-900 font-medium">{selectedCustomer.contactPerson}</p>
@@ -409,7 +409,7 @@ export const CustomersView: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Customer Type</label>
                   <select
@@ -455,7 +455,7 @@ export const CustomersView: React.FC = () => {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Contact Person</label>
                   <input
@@ -492,7 +492,7 @@ export const CustomersView: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Credit Limit (₹)</label>
                   <input

@@ -1,5 +1,19 @@
 export type UserRole = 'Admin' | 'Staff' | 'B2B_Buyer';
 
+export type AppRole = 'admin' | 'stock' | 'customer';
+
+export interface UserProfile {
+  id: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+  role: AppRole;
+  status: 'Active' | 'Inactive';
+  created_at?: string;
+  updated_at?: string;
+  last_login?: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -44,6 +58,8 @@ export interface Product {
   isNewArrival?: boolean;
   unit?: string;
   hsnCode?: string;
+  productType?: string;
+  subCategory?: string;
   isDemo?: boolean;
 }
 
