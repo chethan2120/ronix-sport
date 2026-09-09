@@ -215,35 +215,22 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 const LOCAL_STORAGE_KEY = 'ronix_sports_crm_db_v1';
 
 export const normalizeCategory = (cat?: string): string => {
-  if (!cat) return 'Accessories';
+  if (!cat) return 'Sportswear & Accessories';
   const c = cat.trim().toLowerCase();
-  if (c === 'cricket bats' || c === 'cricket bat' || c === 'bats' || c === 'bat') return 'Bats';
-  if (c === 'cricket balls' || c === 'cricket ball' || c === 'balls' || c === 'ball') return 'Balls';
-  if (c === 'kit bags' || c === 'kit bag' || c === 'bags' || c === 'bag') return 'Bags';
-  if (c === 'helmets' || c === 'helmet') return 'Helmets';
-  if (c === 'gloves' || c === 'glove') return 'Gloves';
-  if (c === 'pads' || c === 'pad') return 'Pads';
-  if (c === 'footwear' || c === 'shoes' || c === 'shoe') return 'Footwear';
-  if (c === 'football' || c === 'soccer') return 'Football';
-  if (c === 'badminton') return 'Badminton';
-  if (c === 'basketball') return 'Basketball';
-  if (c === 'fitness') return 'Fitness';
-  if (c === 'accessories') return 'Accessories';
+  if (c.includes('cricket') || c === 'bats' || c === 'balls' || c === 'helmets' || c === 'pads') return 'Cricket';
+  if (c.includes('football') || c === 'soccer') return 'Football';
+  if (c.includes('badminton')) return 'Badminton';
+  if (c.includes('table tennis') || c === 'tt') return 'Table Tennis';
+  if (c.includes('volleyball')) return 'Volleyball';
+  if (c.includes('basketball')) return 'Basketball';
+  if (c.includes('fitness') || c.includes('gym')) return 'Fitness & Gym';
+  if (c.includes('sportswear') || c.includes('accessories') || c === 'bags' || c === 'footwear') return 'Sportswear & Accessories';
   return cat.trim();
 };
 
 export const sanitizeProduct = (p: Product): Product => {
   const normCat = normalizeCategory(p.category);
-  let prodType = p.productType || p.subCategory || '';
-
-  // Fix specific misplaced product BAG-04 / BAG-KIT-04 or any bag product under Bats
-  if (p.sku === 'BAG-04' || p.sku === 'BAG-KIT-04' || (p.name.toLowerCase().includes('bag') && normCat === 'Bats')) {
-    return {
-      ...p,
-      category: 'Bags',
-      productType: prodType || 'Kit Bag',
-    };
-  }
+  const prodType = p.productType || p.subCategory || '';
 
   return {
     ...p,
@@ -252,19 +239,35 @@ export const sanitizeProduct = (p: Product): Product => {
   };
 };
 
+export const deduplicateProducts = (items: Product[]): Product[] => {
+  const map = new Map<string, Product>();
+
+  items.forEach((p) => {
+    const normKey = `${(p.name || '').trim().toLowerCase()}_${(p.brand || '').trim().toLowerCase()}`;
+    if (!map.has(normKey)) {
+      map.set(normKey, p);
+    } else {
+      const existing = map.get(normKey)!;
+      map.set(normKey, {
+        ...existing,
+        ...p,
+        id: existing.id,
+      });
+    }
+  });
+
+  return Array.from(map.values());
+};
+
 export const DEFAULT_CATEGORIES = [
-  'Bats',
-  'Balls',
-  'Helmets',
-  'Gloves',
-  'Pads',
-  'Bags',
-  'Footwear',
+  'Cricket',
   'Football',
   'Badminton',
+  'Table Tennis',
+  'Volleyball',
   'Basketball',
-  'Fitness',
-  'Accessories',
+  'Fitness & Gym',
+  'Sportswear & Accessories',
 ];
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -303,7 +306,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [products, setProducts] = useState<Product[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_products`);
     const loaded: Product[] = saved ? JSON.parse(saved) : tagWithDemo(INITIAL_PRODUCTS);
-    return loaded.map((p) => {
+    
+    // Combine loaded with INITIAL_PRODUCTS to guarantee the 50 catalogue items exist
+    const combined = [...loaded, ...tagWithDemo(INITIAL_PRODUCTS)];
+    const deduplicated = deduplicateProducts(combined);
+
+    return deduplicated.map((p) => {
       const sanitized = sanitizeProduct(p);
       const skuAsset = getSkuProductAsset(sanitized.sku, sanitized.category, sanitized.name, sanitized.productType);
       const imgUrl = (skuAsset && skuAsset !== RASTER_FALLBACK_IMAGE)
@@ -1418,6 +1426,29 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     openingStock: number = 0,
     warehouseId: string = currentWarehouse.id
   ): Product => {
+    const normName = (productData.name || '').trim().toLowerCase();
+    const normBrand = (productData.brand || '').trim().toLowerCase();
+    const existingIndex = products.findIndex(
+      (p) => (p.name || '').trim().toLowerCase() === normName && (p.brand || '').trim().toLowerCase() === normBrand
+    );
+
+    if (existingIndex !== -1) {
+      const existing = products[existingIndex];
+      const updatedProduct: Product = {
+        ...existing,
+        ...productData,
+        id: existing.id,
+      };
+
+      setProducts((prev) => {
+        const next = [...prev];
+        next[existingIndex] = updatedProduct;
+        return next;
+      });
+
+      return updatedProduct;
+    }
+
     const newId = `prod-${Date.now().toString().slice(-6)}`;
     const newProduct: Product = {
       ...productData,

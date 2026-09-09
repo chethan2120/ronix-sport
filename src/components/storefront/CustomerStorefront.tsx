@@ -182,17 +182,23 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
     return Object.values(cart).reduce((acc, qty) => acc + qty, 0);
   }, [cart]);
 
-  // Categories definition with raster product photos
-  const categoriesList = [
-    { name: 'Cricket', count: 12, desc: 'Bats, Balls & Protection', image: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-red-50/60' },
-    { name: 'Football', count: 8, desc: 'Balls, Studs & Training', image: 'https://images.unsplash.com/photo-1614632537190-23e4146777db?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-emerald-50/60' },
-    { name: 'Badminton', count: 7, desc: 'Rackets, Shuttles & Grips', image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-sky-50/60' },
-    { name: 'Table Tennis', count: 4, desc: 'Bats, Balls & Nets', image: 'https://images.unsplash.com/photo-1534158914592-062992fbe900?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-amber-50/60' },
-    { name: 'Volleyball', count: 2, desc: 'Match Balls & Nets', image: 'https://images.unsplash.com/photo-1592656094267-764a45160876?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-blue-50/60' },
-    { name: 'Basketball', count: 3, desc: 'Balls, Shoes & Hoops', image: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-orange-50/60' },
-    { name: 'Fitness & Gym', count: 8, desc: 'Weights, Mats & Bands', image: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-indigo-50/60' },
-    { name: 'Sportswear & Accessories', count: 6, desc: 'Apparel, Shoes & Bags', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-purple-50/60' },
-  ];
+  // Categories definition with raster product photos & dynamic product counts
+  const categoriesList = useMemo(() => {
+    const getCount = (catName: string) => {
+      return products.filter((p) => normalizeCategory(p.category) === normalizeCategory(catName)).length;
+    };
+
+    return [
+      { name: 'Cricket', count: getCount('Cricket'), desc: 'Bats, Balls & Protection', image: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-red-50/60' },
+      { name: 'Football', count: getCount('Football'), desc: 'Balls, Studs & Training', image: 'https://images.unsplash.com/photo-1614632537190-23e4146777db?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-emerald-50/60' },
+      { name: 'Badminton', count: getCount('Badminton'), desc: 'Rackets, Shuttles & Grips', image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-sky-50/60' },
+      { name: 'Table Tennis', count: getCount('Table Tennis'), desc: 'Bats, Balls & Nets', image: 'https://images.unsplash.com/photo-1534158914592-062992fbe900?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-amber-50/60' },
+      { name: 'Volleyball', count: getCount('Volleyball'), desc: 'Match Balls & Nets', image: 'https://images.unsplash.com/photo-1592656094267-764a45160876?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-blue-50/60' },
+      { name: 'Basketball', count: getCount('Basketball'), desc: 'Balls, Shoes & Hoops', image: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-orange-50/60' },
+      { name: 'Fitness & Gym', count: getCount('Fitness & Gym'), desc: 'Weights, Mats & Bands', image: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-indigo-50/60' },
+      { name: 'Sportswear & Accessories', count: getCount('Sportswear & Accessories'), desc: 'Apparel, Shoes & Bags', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-purple-50/60' },
+    ];
+  }, [products]);
 
   // Dynamic Filtering
   const filteredProducts = useMemo(() => {
@@ -201,18 +207,9 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
       // Category filter
       if (selectedCategory !== 'All Gear') {
-        if (selectedCategory === 'Cricket') {
-          if (!['Cricket', 'Bats', 'Balls', 'Helmets', 'Gloves', 'Pads'].includes(prodCategoryNorm) && !['Cricket', 'Bats', 'Balls', 'Helmets', 'Gloves', 'Pads'].includes(prod.category)) {
-            return false;
-          }
-        } else if (selectedCategory === 'Fitness & Gym') {
-          if (prodCategoryNorm !== 'Fitness' && prod.category !== 'Fitness & Gym') return false;
-        } else if (selectedCategory === 'Sportswear & Accessories') {
-          if (!['Footwear', 'Bags', 'Accessories'].includes(prodCategoryNorm) && !['Footwear', 'Bags', 'Accessories'].includes(prod.category)) return false;
-        } else {
-          if (prodCategoryNorm !== normalizeCategory(selectedCategory) && prod.category !== selectedCategory) {
-            return false;
-          }
+        const selectedNorm = normalizeCategory(selectedCategory);
+        if (prodCategoryNorm !== selectedNorm) {
+          return false;
         }
       }
 
@@ -547,7 +544,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               )}
             </div>
 
-            {/* Desktop Right Controls (Cart, Profile) */}
+            {/* Desktop Right Controls (Cart, Wishlist, Customer Name Dropdown) */}
             <div className="flex items-center space-x-3 shrink-0">
               {/* Cart Button */}
               <button
@@ -564,24 +561,39 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                 )}
               </button>
 
-              {/* Profile Dropdown */}
+              {/* Wishlist Button (Immediately next to Cart - ONLY clean heart icon, NO text label) */}
+              <button
+                onClick={() => {
+                  setActiveTab('account');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="relative p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-800 hover:text-[#E31B23] border border-slate-200 transition-colors cursor-pointer flex items-center justify-center w-9 h-9"
+                title="View Wishlist"
+              >
+                <Heart className="w-4 h-4 text-[#E31B23]" />
+                {Object.values(wishlist).filter(Boolean).length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E31B23] text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-2xs">
+                    {Object.values(wishlist).filter(Boolean).length}
+                  </span>
+                )}
+              </button>
+
+              {/* Customer Name Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setShowAccountDropdown(!showAccountDropdown)}
                   className="flex items-center space-x-2 p-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors cursor-pointer border border-slate-200 shadow-2xs"
                 >
-                  <div className="w-6 h-6 rounded-full bg-[#E31B23] text-white flex items-center justify-center font-black text-xs">
+                  <div className="w-6 h-6 rounded-full bg-[#E31B23] text-white flex items-center justify-center font-black text-xs shrink-0">
                     {profile?.full_name?.charAt(0) || 'R'}
                   </div>
-                  <span className="font-extrabold text-slate-800">Profile</span>
+                  <span className="font-extrabold text-slate-800 truncate max-w-[150px]">
+                    {profile?.full_name || 'Rahul Customer'}
+                  </span>
                 </button>
 
                 {showAccountDropdown && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-4 py-2 border-b border-slate-100">
-                      <p className="text-xs font-black text-slate-900 truncate">{profile?.full_name || 'Rahul'}</p>
-                      <p className="text-[10px] text-slate-500 truncate">{profile?.email || 'customer@gmail.com'}</p>
-                    </div>
+                  <div className="absolute right-0 mt-2 w-44 bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
                     <button
                       onClick={() => {
                         setActiveTab('account');
@@ -590,7 +602,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                       }}
                       className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between"
                     >
-                      <span>Address Management</span>
+                      <span>Profile</span>
                     </button>
                     <button
                       onClick={() => {
@@ -598,57 +610,19 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                         setShowAccountDropdown(false);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between"
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between border-t border-slate-100"
                     >
                       <span>My Orders</span>
                     </button>
                     <button
                       onClick={() => {
-                        setActiveTab('account');
                         setShowAccountDropdown(false);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        signOut();
                       }}
-                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between"
-                    >
-                      <span>Saved Items / Wishlist</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActiveTab('account');
-                        setShowAccountDropdown(false);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between"
-                    >
-                      <span>Account Settings</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowAccountDropdown(false);
-                        setIsPasswordModalOpen(true);
-                      }}
-                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center gap-2"
-                    >
-                      <Lock className="w-3.5 h-3.5 text-[#E31B23]" />
-                      <span>Security / Change Password</span>
-                    </button>
-                    {onBackToCRM && (
-                      <button
-                        onClick={() => {
-                          setShowAccountDropdown(false);
-                          onBackToCRM();
-                        }}
-                        className="w-full text-left px-4 py-2 text-xs font-bold text-[#E31B23] hover:bg-red-50 cursor-pointer border-t border-slate-100"
-                      >
-                        <span>Admin CRM</span>
-                      </button>
-                    )}
-                    <button
-                      onClick={() => signOut()}
                       className="w-full text-left px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 border-t border-slate-100 cursor-pointer flex items-center gap-2"
                     >
                       <LogOut className="w-3.5 h-3.5" />
-                      <span>Log Out</span>
+                      <span>Logout</span>
                     </button>
                   </div>
                 )}
@@ -677,11 +651,29 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                 <button
                   onClick={() => setIsCartOpen(true)}
                   className="relative p-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 cursor-pointer"
+                  title="Cart"
                 >
                   <ShoppingBag className="w-4 h-4 text-[#E31B23]" />
                   {totalCartCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E31B23] text-white text-[9px] font-black rounded-full flex items-center justify-center">
                       {totalCartCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Mobile Wishlist Button */}
+                <button
+                  onClick={() => {
+                    setActiveTab('account');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="relative p-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 cursor-pointer"
+                  title="Wishlist"
+                >
+                  <Heart className="w-4 h-4 text-[#E31B23]" />
+                  {Object.values(wishlist).filter(Boolean).length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E31B23] text-white text-[9px] font-black rounded-full flex items-center justify-center">
+                      {Object.values(wishlist).filter(Boolean).length}
                     </span>
                   )}
                 </button>
@@ -696,7 +688,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   <div className="w-5 h-5 rounded-full bg-[#E31B23] text-white flex items-center justify-center font-black text-[10px]">
                     {profile?.full_name?.charAt(0) || 'R'}
                   </div>
-                  <span className="font-bold">Profile</span>
+                  <span className="font-bold max-w-[100px] truncate">{profile?.full_name || 'Rahul Customer'}</span>
                 </button>
               </div>
             </div>
@@ -1366,6 +1358,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   'Football',
                   'Badminton',
                   'Table Tennis',
+                  'Volleyball',
+                  'Basketball',
                   'Fitness & Gym',
                   'Sportswear & Accessories',
                 ].map((catName) => {
