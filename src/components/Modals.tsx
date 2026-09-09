@@ -45,6 +45,10 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
     minStockLevel: 20,
     initialStock: 100,
     image: '',
+    discountType: 'none' as 'none' | 'percentage' | 'flat',
+    discountValue: 0,
+    discountStartDate: '',
+    discountEndDate: '',
   });
 
   if (!isOpen) return null;
@@ -84,6 +88,15 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
 
     if (!formData.name || !formData.sku) return;
 
+    if (formData.discountType === 'percentage' && (formData.discountValue < 0 || formData.discountValue > 100)) {
+      alert('Percentage discount must be between 0% and 100%');
+      return;
+    }
+    if (formData.discountType === 'flat' && formData.discountValue > formData.retailPrice) {
+      alert(`Flat discount (₹${formData.discountValue}) cannot exceed Selling Price (₹${formData.retailPrice})`);
+      return;
+    }
+
     let finalCategory = formData.category;
 
     if (formData.category === 'Others') {
@@ -118,6 +131,10 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
       hsnCode: '9506.99',
       gstPercent: 18,
       status: 'Active',
+      discountType: formData.discountType,
+      discountValue: Number(formData.discountValue),
+      discountStartDate: formData.discountStartDate || null,
+      discountEndDate: formData.discountEndDate || null,
     }, Number(formData.initialStock));
 
     // Reset local custom category & product type state
@@ -365,6 +382,76 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-[#E31B23] focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
               />
             </div>
+          </div>
+
+          {/* Admin Discount Control */}
+          <div className="p-3 bg-red-50/60 border border-red-200 rounded-2xl space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label className="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
+                <span className="w-2 h-2 rounded-full bg-[#E31B23]"></span>
+                <span>Promotional Discount Control</span>
+              </label>
+              {formData.discountType !== 'none' && (
+                <span className="text-[10px] font-extrabold text-[#E31B23] bg-white px-2 py-0.5 rounded-full border border-red-200 shadow-2xs">
+                  {formData.discountType === 'percentage' ? `${formData.discountValue}% OFF` : `₹${formData.discountValue} OFF`}
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label className="font-bold text-slate-700 block mb-1 text-[11px]">Discount Type</label>
+                <select
+                  value={formData.discountType}
+                  onChange={(e) => setFormData({ ...formData, discountType: e.target.value as any })}
+                  className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-[#E31B23] focus:outline-none text-xs"
+                >
+                  <option value="none">No Discount</option>
+                  <option value="percentage">Percentage (%)</option>
+                  <option value="flat">Flat Amount (₹)</option>
+                </select>
+              </div>
+
+              {formData.discountType !== 'none' && (
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1 text-[11px]">
+                    Discount Value {formData.discountType === 'percentage' ? '(%)' : '(₹)'}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max={formData.discountType === 'percentage' ? 100 : formData.retailPrice}
+                    value={formData.discountValue}
+                    onChange={(e) => setFormData({ ...formData, discountValue: Number(e.target.value) })}
+                    placeholder={formData.discountType === 'percentage' ? 'e.g. 20' : 'e.g. 500'}
+                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-[#E31B23] focus:outline-none text-xs"
+                  />
+                </div>
+              )}
+            </div>
+
+            {formData.discountType !== 'none' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1 text-[11px]">Start Date (Optional)</label>
+                  <input
+                    type="date"
+                    value={formData.discountStartDate}
+                    onChange={(e) => setFormData({ ...formData, discountStartDate: e.target.value })}
+                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-medium text-xs focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1 text-[11px]">End Date (Optional)</label>
+                  <input
+                    type="date"
+                    value={formData.discountEndDate}
+                    onChange={(e) => setFormData({ ...formData, discountEndDate: e.target.value })}
+                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-medium text-xs focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

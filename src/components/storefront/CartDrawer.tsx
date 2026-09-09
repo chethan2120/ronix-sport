@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck } from 'lucide-react';
-import { Product } from '../../types';
+import { Product, getEffectiveProductPrice } from '../../types';
 import { ProductImage } from '../ProductImage';
 
 export interface CartItemType {
@@ -28,7 +28,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   if (!isOpen) return null;
 
   const totalItems = items.reduce((acc, it) => acc + it.quantity, 0);
-  const subtotal = items.reduce((acc, it) => acc + it.product.retailPrice * it.quantity, 0);
+  const subtotal = items.reduce((acc, it) => {
+    const disc = getEffectiveProductPrice(it.product);
+    return acc + disc.finalPrice * it.quantity;
+  }, 0);
   const freeShippingThreshold = 999;
   const isFreeShipping = subtotal >= freeShippingThreshold;
   const shippingFee = isFreeShipping ? 0 : 99;
@@ -111,71 +114,74 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </button>
             </div>
           ) : (
-            items.map(({ product, quantity }) => (
-              <div
-                key={product.id}
-                className="flex items-center space-x-3.5 p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all shadow-2xs"
-              >
-                {/* Thumbnail */}
-                <div className="w-16 h-16 rounded-lg bg-slate-50 border border-slate-100 p-1 flex items-center justify-center shrink-0 overflow-hidden">
-                  <ProductImage
-                    src={product.image}
-                    alt={product.name}
-                    category={product.category}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+            items.map(({ product, quantity }) => {
+              const disc = getEffectiveProductPrice(product);
+              return (
+                <div
+                  key={product.id}
+                  className="flex items-center space-x-3.5 p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all shadow-2xs"
+                >
+                  {/* Thumbnail */}
+                  <div className="w-16 h-16 rounded-lg bg-slate-50 border border-slate-100 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                    <ProductImage
+                      src={product.image}
+                      alt={product.name}
+                      category={product.category}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
 
-                {/* Details */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-xs font-bold text-slate-900 truncate leading-snug">
-                    {product.name}
-                  </h4>
-                  <p className="text-[11px] text-slate-400 font-medium">
-                    {product.brand} &bull; {product.category}
-                  </p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-xs font-bold text-slate-900">
-                      ₹{(product.retailPrice * quantity).toLocaleString('en-IN')}
-                    </span>
-                    {quantity > 1 && (
-                      <span className="text-[10px] text-slate-400">
-                        (₹{product.retailPrice.toLocaleString('en-IN')} ea)
+                  {/* Details */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-xs font-bold text-slate-900 truncate leading-snug">
+                      {product.name}
+                    </h4>
+                    <p className="text-[11px] text-slate-400 font-medium">
+                      {product.brand} &bull; {product.category}
+                    </p>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <span className="text-xs font-black text-slate-900">
+                        ₹{(disc.finalPrice * quantity).toLocaleString('en-IN')}
                       </span>
-                    )}
+                      {disc.hasDiscount && (
+                        <span className="text-[10px] text-slate-400 line-through font-medium">
+                          ₹{(disc.originalPrice * quantity).toLocaleString('en-IN')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Quantity & Delete */}
+                  <div className="flex flex-col items-end space-y-2">
+                    <button
+                      onClick={() => onRemoveItem(product.id)}
+                      className="text-slate-400 hover:text-red-500 transition-colors p-1"
+                      title="Remove item"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50">
+                      <button
+                        onClick={() => onUpdateQty(product.id, -1)}
+                        className="w-6 h-6 flex items-center justify-center text-slate-600 hover:bg-slate-200 rounded-l-md transition-colors"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="w-7 text-center text-xs font-bold text-slate-800">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => onUpdateQty(product.id, 1)}
+                        className="w-6 h-6 flex items-center justify-center text-slate-600 hover:bg-slate-200 rounded-r-md transition-colors"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-                {/* Quantity & Delete */}
-                <div className="flex flex-col items-end space-y-2">
-                  <button
-                    onClick={() => onRemoveItem(product.id)}
-                    className="text-slate-400 hover:text-red-500 transition-colors p-1"
-                    title="Remove item"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-
-                  <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50">
-                    <button
-                      onClick={() => onUpdateQty(product.id, -1)}
-                      className="w-6 h-6 flex items-center justify-center text-slate-600 hover:bg-slate-200 rounded-l-md transition-colors"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <span className="w-7 text-center text-xs font-bold text-slate-800">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => onUpdateQty(product.id, 1)}
-                      className="w-6 h-6 flex items-center justify-center text-slate-600 hover:bg-slate-200 rounded-r-md transition-colors"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

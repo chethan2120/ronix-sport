@@ -43,8 +43,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const isOutOfStock = availableStock <= 0;
   const isLowStock = availableStock > 0 && availableStock <= 10;
 
-  const mrp = product.mrp || Math.round(product.retailPrice * 1.25);
-  const discountPercent = Math.round(((mrp - product.retailPrice) / mrp) * 100);
+  const discInfo = getEffectiveProductPrice(product);
 
   // Related products
   const relatedProducts = products
@@ -86,9 +85,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         {/* Left Column: Product Image Gallery */}
         <div className="lg:col-span-6 space-y-4">
           <div className="relative aspect-square w-full rounded-2xl bg-[#F8F9FA] border border-slate-100 flex items-center justify-center p-8 overflow-hidden">
-            {discountPercent > 0 && (
-              <span className="absolute top-4 left-4 z-10 px-2.5 py-1 rounded-full bg-[#E31B23] text-white text-xs font-black shadow-xs tracking-wider uppercase">
-                {discountPercent}% OFF
+            {discInfo.hasDiscount && (
+              <span className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-[#E31B23] text-white text-xs font-black shadow-xs tracking-wider uppercase">
+                {discInfo.discountLabel}
               </span>
             )}
             <ProductImage
@@ -150,15 +149,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             <div className="p-4 rounded-xl bg-[#F8F9FA] border border-slate-200 space-y-1">
               <div className="flex items-baseline space-x-3">
                 <span className="text-3xl font-black text-[#111827]">
-                  ₹{product.retailPrice.toLocaleString('en-IN')}
+                  ₹{discInfo.finalPrice.toLocaleString('en-IN')}
                 </span>
-                {mrp > product.retailPrice && (
+                {discInfo.hasDiscount && (
                   <>
-                    <span className="text-base text-slate-400 line-through">
-                      ₹{mrp.toLocaleString('en-IN')}
+                    <span className="text-base text-slate-400 line-through font-medium">
+                      ₹{discInfo.originalPrice.toLocaleString('en-IN')}
                     </span>
-                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-                      Save ₹{(mrp - product.retailPrice).toLocaleString('en-IN')} ({discountPercent}% OFF)
+                    <span className="text-xs font-black text-[#E31B23] bg-red-50 px-2.5 py-0.5 rounded-md border border-red-100">
+                      {discInfo.discountLabel}
                     </span>
                   </>
                 )}

@@ -58,6 +58,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     mrp: 3299,
     rating: 4.6,
     reviewsCount: 48,
+    discountType: 'percentage',
+    discountValue: 20,
   },
   {
     id: 'prod-cri-002',
@@ -80,6 +82,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     reviewsCount: 84,
     isFeatured: true,
     isBestSeller: true,
+    discountType: 'flat',
+    discountValue: 1000,
   },
   {
     id: 'prod-cri-003',

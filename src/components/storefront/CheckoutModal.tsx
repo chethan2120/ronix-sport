@@ -13,6 +13,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { getEffectiveProductPrice } from '../../types';
 import { CartItemType } from './CartDrawer';
 
 interface CheckoutModalProps {
@@ -42,7 +43,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
-  const subtotal = items.reduce((acc, it) => acc + it.product.retailPrice * it.quantity, 0);
+  const subtotal = items.reduce((acc, it) => {
+    const disc = getEffectiveProductPrice(it.product);
+    return acc + disc.finalPrice * it.quantity;
+  }, 0);
   const isFreeShipping = subtotal >= 999;
   const shippingFee = isFreeShipping ? 0 : 99;
   const grandTotal = subtotal + shippingFee;

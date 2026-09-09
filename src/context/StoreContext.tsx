@@ -1014,7 +1014,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     const orderItems: CustomerOrderItem[] = orderData.items.map((item) => {
       const prod = products.find((p) => p.id === item.productId)!;
-      const itemTotal = prod.retailPrice * item.quantity;
+      const disc = getEffectiveProductPrice(prod);
+      const effectivePrice = disc.finalPrice;
+      const itemTotal = effectivePrice * item.quantity;
       total += itemTotal;
       subtotal += itemTotal;
 
@@ -1035,7 +1037,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         image: prod.image,
         productType: prod.productType,
         quantity: item.quantity,
-        unitPrice: prod.retailPrice,
+        unitPrice: effectivePrice,
         subtotal: itemTotal,
       };
     });

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Product } from '../types';
 import { getSkuProductAsset } from '../data/productAssets';
+import { SpecificProductSVG } from './storefront/SportsIllustrations';
 
 interface ProductImageProps {
   src?: string;
@@ -129,24 +130,11 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   const catDetails = getCategoryDetails(prodCat, prodName);
   const Icon = catDetails.icon;
 
-  // Category-based Fallback view when no valid product image is available
+  // Category-based Fallback view using dynamic SVG product illustration
   if (!imageSrc || hasError) {
     return (
-      <div
-        className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${catDetails.bg} text-slate-600 rounded-xl p-2 select-none border border-slate-200/80 shadow-2xs ${
-          fallbackClassName || ''
-        }`}
-        title={prodName || catDetails.label}
-      >
-        <div className={`w-8 h-8 rounded-lg bg-white/90 shadow-xs flex items-center justify-center ${catDetails.color} mb-1 shrink-0`}>
-          <Icon className="w-4 h-4" />
-        </div>
-        <span className="text-[10px] font-black tracking-wider text-slate-800 uppercase text-center leading-tight truncate max-w-full px-1">
-          {catDetails.label}
-        </span>
-        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
-          RONIX
-        </span>
+      <div className={`w-full h-full flex items-center justify-center p-1.5 bg-slate-50/80 rounded-xl ${fallbackClassName || ''}`}>
+        <SpecificProductSVG category={prodCat} productType={prodType} name={prodName} className={className} />
       </div>
     );
   }

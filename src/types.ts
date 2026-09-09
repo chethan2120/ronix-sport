@@ -62,6 +62,89 @@ export interface Product {
   productType?: string;
   subCategory?: string;
   isDemo?: boolean;
+
+  // Admin Discount Control Fields
+  discountType?: DiscountType;
+  discountValue?: number;
+  discountStartDate?: string | null;
+  discountEndDate?: string | null;
+}
+
+export type DiscountType = 'none' | 'percentage' | 'flat';
+
+export interface ActiveDiscountInfo {
+  hasDiscount: boolean;
+  finalPrice: number;
+  originalPrice: number;
+  discountLabel: string;
+  discountAmount: number;
+  discountType: DiscountType;
+  discountValue: number;
+}
+
+export function getEffectiveProductPrice(product: Product, targetDate = new Date()): ActiveDiscountInfo {
+  const basePrice = Number(product.retailPrice) || 0;
+  const noDiscountResult: ActiveDiscountInfo = {
+    hasDiscount: false,
+    finalPrice: basePrice,
+    originalPrice: basePrice,
+    discountLabel: '',
+    discountAmount: 0,
+    discountType: 'none',
+    discountValue: 0,
+  };
+
+  const discType = product.discountType || 'none';
+  const discVal = Number(product.discountValue) || 0;
+
+  if (discType === 'none' || discVal <= 0) {
+    return noDiscountResult;
+  }
+
+  if (product.discountStartDate) {
+    const start = new Date(product.discountStartDate);
+    start.setHours(0, 0, 0, 0);
+    if (targetDate < start) {
+      return noDiscountResult;
+    }
+  }
+
+  if (product.discountEndDate) {
+    const end = new Date(product.discountEndDate);
+    end.setHours(23, 59, 59, 999);
+    if (targetDate > end) {
+      return noDiscountResult;
+    }
+  }
+
+  let finalPrice = basePrice;
+  let discountLabel = '';
+  let discountAmount = 0;
+
+  if (discType === 'percentage') {
+    const pct = Math.min(100, Math.max(0, discVal));
+    discountAmount = Math.round((basePrice * pct) / 100);
+    finalPrice = Math.max(0, basePrice - discountAmount);
+    discountLabel = `${pct}% OFF`;
+  } else if (discType === 'flat') {
+    discountAmount = Math.min(basePrice, Math.max(0, discVal));
+    finalPrice = Math.max(0, basePrice - discountAmount);
+    discountLabel = `₹${discountAmount} OFF`;
+  }
+
+  if (discountAmount <= 0) {
+    return noDiscountResult;
+  }
+
+  return {
+    hasDiscount: true,
+    finalPrice,
+    originalPrice: basePrice,
+    discountLabel,
+    discountAmount,
+    discountType: discType,
+    discountValue: discVal,
+  };
 }
 
 export interface CartItem {
