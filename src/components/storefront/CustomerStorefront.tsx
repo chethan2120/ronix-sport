@@ -42,6 +42,7 @@ import { CartDrawer, CartItemType } from './CartDrawer';
 import { CheckoutModal } from './CheckoutModal';
 import { getTypesForCategory } from '../../data/productTypes';
 import { SportsCategoryCarousel, CategorySlideData } from '../ui/sports-category-carousel';
+import { PasswordChangeModal } from '../auth/PasswordChangeModal';
 
 interface CustomerStorefrontProps {
   onBackToCRM?: () => void;
@@ -63,8 +64,9 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   const [selectedSubtype, setSelectedSubtype] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Account Menu Popup State
+  // Account Menu Popup & Password Change State
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   // Modals & Drawers
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -497,14 +499,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-16 md:pb-0 overflow-x-hidden">
-      {/* THIN RED ANNOUNCEMENT BAR */}
-      <div className="bg-[#E31B23] text-white text-[11px] font-black py-1.5 px-4 tracking-wider text-center flex items-center justify-center gap-2 shadow-xs border-b border-red-700">
-        <Truck className="w-3.5 h-3.5" />
-        <span>Free delivery on eligible orders | Bulk B2B pricing for teams and academies</span>
-      </div>
-
-      {/* BRAND IDENTITY PREMIUM STICKY HEADER */}
-      <header className="sticky top-0 z-50 bg-[#0B0F17] text-white border-b border-slate-800 shadow-md">
+      {/* CLEAN BRIGHT STICKY HEADER */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md text-slate-900 border-b border-slate-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           {/* DESKTOP HEADER LAYOUT */}
           <div className="hidden md:flex items-center justify-between gap-6">
@@ -513,95 +509,54 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               onClick={handleLogoClick}
               className="flex items-center space-x-3 cursor-pointer shrink-0 group"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#E31B23] flex items-center justify-center text-white font-black text-xl shadow-md group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-[#E31B23] flex items-center justify-center text-white font-black text-xl shadow-sm group-hover:scale-105 transition-transform">
                 R
               </div>
               <div>
-                <span className="text-xl font-black tracking-tight text-white block leading-none">
+                <span className="text-xl font-black tracking-tight text-slate-900 block leading-none">
                   RONIX <span className="text-[#E31B23]">SPORTS</span>
                 </span>
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mt-0.5">
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block mt-0.5">
                   PERFORMANCE STORE
                 </span>
               </div>
             </div>
 
-            {/* Desktop Navigation Category Links */}
-            <nav className="flex items-center space-x-1 lg:space-x-2 text-xs font-bold text-slate-300">
-              <button
-                onClick={() => {
-                  setActiveTab('home');
-                  setSelectedCategory('All Gear');
-                  setSelectedSubtype('All');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+            {/* Desktop Search Bar (Centered) */}
+            <div className="relative flex-1 max-w-md">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (e.target.value.trim() && activeTab !== 'category') {
+                    setActiveTab('category');
+                  }
                 }}
-                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  activeTab === 'home' && selectedCategory === 'All Gear'
-                    ? 'text-white bg-[#E31B23] shadow-xs'
-                    : 'hover:text-white hover:bg-slate-800/80'
-                }`}
-              >
-                Shop All
-              </button>
-
-              {['Cricket', 'Football', 'Badminton', 'Fitness & Gym', 'Sportswear & Accessories'].map((catName) => (
+                placeholder="Search equipment, gear, sports..."
+                className="w-full pl-9 pr-8 py-2 bg-slate-100/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#E31B23] focus:bg-white focus:border-transparent transition-all"
+              />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              {searchQuery && (
                 <button
-                  key={catName}
-                  onClick={() => handleSelectCategory(catName)}
-                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                    activeTab === 'category' && selectedCategory === catName
-                      ? 'text-white bg-[#E31B23] shadow-xs'
-                      : 'hover:text-white hover:bg-slate-800/80'
-                  }`}
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-700 cursor-pointer"
                 >
-                  {catName === 'Sportswear & Accessories' ? 'Sportswear' : catName}
+                  <X className="w-4 h-4" />
                 </button>
-              ))}
+              )}
+            </div>
 
-              <button
-                onClick={() => handleSelectCategory('All Gear')}
-                className="px-3 py-1.5 rounded-lg text-amber-400 hover:text-amber-300 font-extrabold transition-all cursor-pointer hover:bg-slate-800/80 flex items-center gap-1"
-              >
-                <Tag className="w-3.5 h-3.5 text-amber-400" />
-                <span>B2B Wholesale</span>
-              </button>
-            </nav>
-
-            {/* Desktop Right Controls (Search Input, Cart, Account) */}
+            {/* Desktop Right Controls (Cart, Profile) */}
             <div className="flex items-center space-x-3 shrink-0">
-              {/* Search Input */}
-              <div className="relative w-44 lg:w-56">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    if (e.target.value.trim() && activeTab !== 'category') {
-                      setActiveTab('category');
-                    }
-                  }}
-                  placeholder="Search gear..."
-                  className="w-full pl-8 pr-7 py-1.5 bg-slate-800/90 border border-slate-700 rounded-xl text-xs font-semibold text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#E31B23] focus:border-transparent transition-all"
-                />
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-2 text-slate-400 hover:text-white cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-
               {/* Cart Button */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2 rounded-xl bg-slate-800/90 hover:bg-red-950/80 hover:text-[#E31B23] text-slate-200 border border-slate-700 transition-colors cursor-pointer flex items-center gap-1 px-3"
+                className="relative p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-800 hover:text-[#E31B23] border border-slate-200 transition-colors cursor-pointer flex items-center gap-1.5 px-3.5"
                 title="View Shopping Cart"
               >
                 <ShoppingBag className="w-4 h-4 text-[#E31B23]" />
-                <span className="text-xs font-bold hidden lg:inline">Cart</span>
+                <span className="text-xs font-bold">Cart</span>
                 {totalCartCount > 0 && (
                   <span className="ml-1 px-1.5 py-0.2 bg-[#E31B23] text-white text-[10px] font-black rounded-full shadow-2xs">
                     {totalCartCount}
@@ -609,23 +564,23 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                 )}
               </button>
 
-              {/* User Account Dropdown */}
+              {/* Profile Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setShowAccountDropdown(!showAccountDropdown)}
-                  className="flex items-center space-x-2 p-1.5 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors cursor-pointer border border-slate-700"
+                  className="flex items-center space-x-2 p-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors cursor-pointer border border-slate-200 shadow-2xs"
                 >
-                  <div className="w-5 h-5 rounded-full bg-[#E31B23] text-white flex items-center justify-center font-black text-[10px]">
+                  <div className="w-6 h-6 rounded-full bg-[#E31B23] text-white flex items-center justify-center font-black text-xs">
                     {profile?.full_name?.charAt(0) || 'R'}
                   </div>
-                  <span className="max-w-[100px] truncate">{profile?.full_name || 'Rahul'}</span>
+                  <span className="font-extrabold text-slate-800">Profile</span>
                 </button>
 
                 {showAccountDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-slate-900 text-white rounded-2xl shadow-2xl border border-slate-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-4 py-2 border-b border-slate-800">
-                      <p className="text-xs font-black text-white truncate">{profile?.full_name || 'Rahul'}</p>
-                      <p className="text-[10px] text-slate-400 truncate">{profile?.email || 'customer@gmail.com'}</p>
+                  <div className="absolute right-0 mt-2 w-56 bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                    <div className="px-4 py-2 border-b border-slate-100">
+                      <p className="text-xs font-black text-slate-900 truncate">{profile?.full_name || 'Rahul'}</p>
+                      <p className="text-[10px] text-slate-500 truncate">{profile?.email || 'customer@gmail.com'}</p>
                     </div>
                     <button
                       onClick={() => {
@@ -633,9 +588,9 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                         setShowAccountDropdown(false);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer"
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between"
                     >
-                      Profile & Account
+                      <span>Address Management</span>
                     </button>
                     <button
                       onClick={() => {
@@ -643,9 +598,39 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                         setShowAccountDropdown(false);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer"
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between"
                     >
-                      My Orders
+                      <span>My Orders</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setActiveTab('account');
+                        setShowAccountDropdown(false);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between"
+                    >
+                      <span>Saved Items / Wishlist</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setActiveTab('account');
+                        setShowAccountDropdown(false);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center justify-between"
+                    >
+                      <span>Account Settings</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAccountDropdown(false);
+                        setIsPasswordModalOpen(true);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer flex items-center gap-2"
+                    >
+                      <Lock className="w-3.5 h-3.5 text-[#E31B23]" />
+                      <span>Security / Change Password</span>
                     </button>
                     {onBackToCRM && (
                       <button
@@ -653,16 +638,17 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                           setShowAccountDropdown(false);
                           onBackToCRM();
                         }}
-                        className="w-full text-left px-4 py-2 text-xs font-bold text-[#E31B23] hover:bg-red-950/50 cursor-pointer"
+                        className="w-full text-left px-4 py-2 text-xs font-bold text-[#E31B23] hover:bg-red-50 cursor-pointer border-t border-slate-100"
                       >
-                        Admin CRM
+                        <span>Admin CRM</span>
                       </button>
                     )}
                     <button
                       onClick={() => signOut()}
-                      className="w-full text-left px-4 py-2 text-xs font-bold text-rose-400 hover:bg-rose-950/50 border-t border-slate-800 cursor-pointer"
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 border-t border-slate-100 cursor-pointer flex items-center gap-2"
                     >
-                      Log Out
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Log Out</span>
                     </button>
                   </div>
                 )}
@@ -681,7 +667,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   R
                 </div>
                 <div>
-                  <span className="text-base font-black tracking-tight text-white block leading-none">
+                  <span className="text-base font-black tracking-tight text-slate-900 block leading-none">
                     RONIX <span className="text-[#E31B23]">SPORTS</span>
                   </span>
                 </div>
@@ -690,7 +676,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="relative p-2 rounded-xl bg-slate-800 text-slate-200 cursor-pointer"
+                  className="relative p-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 cursor-pointer"
                 >
                   <ShoppingBag className="w-4 h-4 text-[#E31B23]" />
                   {totalCartCount > 0 && (
@@ -705,11 +691,12 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                     setActiveTab('account');
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="flex items-center space-x-1.5 p-1 px-2.5 rounded-xl bg-slate-800 text-slate-200 text-xs font-bold cursor-pointer border border-slate-700"
+                  className="flex items-center space-x-1.5 p-1 px-2.5 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold cursor-pointer border border-slate-200"
                 >
                   <div className="w-5 h-5 rounded-full bg-[#E31B23] text-white flex items-center justify-center font-black text-[10px]">
                     {profile?.full_name?.charAt(0) || 'R'}
                   </div>
+                  <span className="font-bold">Profile</span>
                 </button>
               </div>
             </div>
@@ -726,7 +713,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   }
                 }}
                 placeholder="Search sports gear..."
-                className="w-full pl-9 pr-8 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-semibold text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#E31B23]"
+                className="w-full pl-9 pr-8 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#E31B23]"
               />
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
               {searchQuery && (
@@ -756,33 +743,27 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
         />
       ) : activeTab === 'home' ? (
         <main className="space-y-10 sm:space-y-12">
-          {/* PREMIUM SPLIT-SCREEN CAMPAIGN HERO */}
+          {/* BRIGHT OFF-WHITE PREMIUM HERO */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-[#0B0F17] text-white border border-slate-800/80 min-h-[460px] md:min-h-[500px] flex items-center">
-              {/* Background Ambient Red Glow */}
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-600/25 via-[#990B11]/15 to-transparent pointer-events-none" />
-              <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-[#E31B23]/10 rounded-full blur-3xl pointer-events-none" />
-
+            <div className="relative rounded-3xl overflow-hidden shadow-sm bg-gradient-to-br from-slate-50 via-white to-red-50/20 text-slate-900 border border-slate-200/90 min-h-[440px] md:min-h-[480px] flex items-center">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 sm:p-10 lg:p-12 w-full items-center relative z-10">
                 {/* Left Content Column */}
                 <div className="lg:col-span-7 space-y-5">
                   {/* Eyebrow */}
-                  <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-black tracking-widest text-red-400 uppercase shadow-xs">
+                  <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-red-50 border border-red-200 text-xs font-black tracking-widest text-[#E31B23] uppercase shadow-2xs">
                     <Trophy className="w-3.5 h-3.5 text-[#E31B23]" />
-                    <span>RONIX PERFORMANCE STORE</span>
+                    <span>RONIX SPORTS STORE</span>
                   </div>
 
                   {/* Heading */}
-                  <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none uppercase text-white">
-                    GEAR BUILT FOR THE <br className="hidden sm:inline" />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-red-400">
-                      WAY YOU PLAY.
-                    </span>
+                  <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none uppercase text-slate-900">
+                    GEAR FOR EVERY <br className="hidden sm:inline" />
+                    <span className="text-[#E31B23]">GAME.</span>
                   </h1>
 
                   {/* Description */}
-                  <p className="text-sm sm:text-base text-slate-300 font-medium max-w-xl leading-relaxed">
-                    Performance equipment for cricket, football, badminton, fitness, and teams that demand more.
+                  <p className="text-sm sm:text-base text-slate-600 font-medium max-w-xl leading-relaxed">
+                    Match-ready equipment, pro supplies, and training essentials for athletes and academies.
                   </p>
 
                   {/* CTAs */}
@@ -792,9 +773,9 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                         handleSelectCategory('All Gear');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="px-7 py-3.5 rounded-xl bg-[#E31B23] hover:bg-[#B5121B] text-white font-black text-xs sm:text-sm shadow-xl shadow-red-600/30 hover:shadow-red-600/50 transition-all cursor-pointer flex items-center gap-2 group active:scale-95"
+                      className="px-7 py-3.5 rounded-xl bg-[#E31B23] hover:bg-[#B5121B] text-white font-black text-xs sm:text-sm shadow-md shadow-red-500/20 transition-all cursor-pointer flex items-center gap-2 group active:scale-95"
                     >
-                      <span>Shop Performance Gear</span>
+                      <span>Shop All Gear</span>
                       <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
                     </button>
 
@@ -803,47 +784,47 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                         setActiveTab('category');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-extrabold text-xs sm:text-sm border border-white/20 transition-all cursor-pointer flex items-center gap-2 active:scale-95"
+                      className="px-6 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-extrabold text-xs sm:text-sm border border-slate-200 shadow-2xs transition-all cursor-pointer flex items-center gap-2 active:scale-95"
                     >
-                      <span>Explore Sports</span>
-                      <ChevronRight className="w-4 h-4 text-slate-300" />
+                      <span>Explore Categories</span>
+                      <ChevronRight className="w-4 h-4 text-slate-500" />
                     </button>
                   </div>
 
                   {/* Compact Credibility Stats */}
-                  <div className="pt-4 border-t border-white/10 grid grid-cols-3 gap-3 max-w-lg">
-                    <div className="flex items-center space-x-2 text-slate-300">
+                  <div className="pt-4 border-t border-slate-200/80 grid grid-cols-3 gap-3 max-w-lg">
+                    <div className="flex items-center space-x-2 text-slate-700">
                       <ShieldCheck className="w-4 h-4 text-[#E31B23] shrink-0" />
-                      <span className="text-[11px] sm:text-xs font-bold leading-tight">Quality-Tested Gear</span>
+                      <span className="text-[11px] sm:text-xs font-bold leading-tight">Quality Tested</span>
                     </div>
 
-                    <div className="flex items-center space-x-2 text-slate-300">
-                      <Award className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span className="text-[11px] sm:text-xs font-bold leading-tight">B2B Team Pricing</span>
+                    <div className="flex items-center space-x-2 text-slate-700">
+                      <Award className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span className="text-[11px] sm:text-xs font-bold leading-tight">Bulk B2B Pricing</span>
                     </div>
 
-                    <div className="flex items-center space-x-2 text-slate-300">
-                      <Truck className="w-4 h-4 text-sky-400 shrink-0" />
+                    <div className="flex items-center space-x-2 text-slate-700">
+                      <Truck className="w-4 h-4 text-sky-500 shrink-0" />
                       <span className="text-[11px] sm:text-xs font-bold leading-tight">Fast Dispatch</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Right Equipment Visual Composition */}
+                {/* Right Equipment Visual Composition (NO Humans/Models) */}
                 <div className="lg:col-span-5 hidden lg:flex flex-col items-center justify-center relative">
-                  <div className="w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 shadow-2xl space-y-4 relative overflow-hidden group">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-5 shadow-lg space-y-4 relative overflow-hidden group">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                         PRO EQUIPMENT MATRIX
                       </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-950/80 text-red-400 border border-red-800/60">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-[#E31B23] border border-red-200">
                         100% GENUINE
                       </span>
                     </div>
 
-                    {/* 2x2 Clean Studio Equipment Composition (NO Humans/Models) */}
+                    {/* 2x2 Clean Studio Equipment Composition */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-white rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-xs hover:scale-105 transition-transform duration-300">
+                      <div className="bg-slate-50/80 rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-2xs hover:scale-105 transition-transform duration-300">
                         <img
                           src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=400&auto=format&fit=crop&q=80"
                           alt="Cricket Bat"
@@ -853,7 +834,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                         <span className="text-[10px] font-black text-slate-800 mt-1">Cricket Bat</span>
                       </div>
 
-                      <div className="bg-white rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-xs hover:scale-105 transition-transform duration-300">
+                      <div className="bg-slate-50/80 rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-2xs hover:scale-105 transition-transform duration-300">
                         <img
                           src="https://images.unsplash.com/photo-1614632537190-23e4146777db?w=400&auto=format&fit=crop&q=80"
                           alt="Pro Football"
@@ -863,7 +844,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                         <span className="text-[10px] font-black text-slate-800 mt-1">Match Football</span>
                       </div>
 
-                      <div className="bg-white rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-xs hover:scale-105 transition-transform duration-300">
+                      <div className="bg-slate-50/80 rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-2xs hover:scale-105 transition-transform duration-300">
                         <img
                           src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80"
                           alt="Badminton Racket"
@@ -873,7 +854,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                         <span className="text-[10px] font-black text-slate-800 mt-1">Pro Racket</span>
                       </div>
 
-                      <div className="bg-white rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-xs hover:scale-105 transition-transform duration-300">
+                      <div className="bg-slate-50/80 rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-2xs hover:scale-105 transition-transform duration-300">
                         <img
                           src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&auto=format&fit=crop&q=80"
                           alt="Hex Dumbbell"
@@ -1837,6 +1818,12 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
           setCart({});
           setActiveTab('my-orders');
         }}
+      />
+
+      {/* PASSWORD CHANGE MODAL */}
+      <PasswordChangeModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
       />
     </div>
   );
