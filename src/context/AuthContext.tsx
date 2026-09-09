@@ -33,6 +33,7 @@ export const DEMO_PROFILES: UserProfile[] = [
     status: 'Active',
     created_at: new Date().toISOString(),
     last_login: new Date().toISOString(),
+    permissions: { inventory: true, 'b2c-pos': true },
   },
   {
     id: 'usr-customer-demo-3',
@@ -61,10 +62,12 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   resetPasswordForEmail: (email: string) => Promise<{ success: boolean; error?: string; message?: string }>;
-  adminCreateStaffUser: (data: { fullName: string; email: string; role: AppRole; tempPassword: string; phone?: string }) => Promise<{ success: boolean; error?: string }>;
+  adminCreateStaffUser: (data: { fullName: string; email: string; role: AppRole; tempPassword: string; phone?: string; permissions?: Record<string, boolean> }) => Promise<{ success: boolean; error?: string }>;
   adminUpdateUser: (userId: string, updates: Partial<UserProfile>) => Promise<{ success: boolean; error?: string }>;
+  adminUpdateUserPermissions: (userId: string, permissions: Record<string, boolean>) => Promise<{ success: boolean; error?: string }>;
   adminResetUserPassword: (userId: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   adminToggleUserStatus: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  hasPermission: (moduleId: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -444,6 +447,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     role: AppRole;
     tempPassword: string;
     phone?: string;
+    permissions?: Record<string, boolean>;
   }): Promise<{ success: boolean; error?: string }> => {
     if (profile?.role !== 'admin') {
       return { success: false, error: 'Permission denied: Only Admins can create staff accounts.' };
@@ -460,6 +464,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (allProfiles.some((p) => p.email.toLowerCase() === cleanEmail)) {
       return { success: false, error: 'An account with this email address already exists.' };
     }
+
+    const initialPermissions = data.permissions || (data.role === 'stock' ? { inventory: true, 'b2c-pos': true } : {});
 
     // Try Supabase Auth API
     if (isSupabaseConfigured) {
@@ -485,6 +491,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             role: data.role,
             status: 'Active',
           });
+
+          // Insert permissions into user_permissions table
+          const permRows = Object.entries(initialPermissions).map(([mod, can]) => ({
+            user_id: sbUser.user!.id,
+            module: mod,
+            can_access: can,
+          }));
+          if (permRows.length > 0) {
+            await supabase.from('user_permissions').upsert(permRows, { onConflict: 'user_id,module' });
+          }
         }
       } catch (err: any) {
         console.warn('Supabase admin create user warning:', err);
@@ -500,6 +516,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       role: data.role,
       status: 'Active',
       created_at: new Date().toISOString(),
+      permissions: initialPermissions,
     };
 
     setAllProfiles((prev) => [newStaffProfile, ...prev]);
@@ -533,6 +550,69 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
 
     return { success: true };
+  };
+
+  // ADMIN UPDATE USER PERMISSIONS
+  const adminUpdateUserPermissions = async (userId: string, permissions: Record<string, boolean>): Promise<{ success: boolean; error?: string }> => {
+    if (profile?.role !== 'admin') {
+      return { success: false, error: 'Permission denied: Admin rights required.' };
+    }
+
+    const targetUser = allProfiles.find((p) => p.id === userId);
+    if (!targetUser) return { success: false, error: 'User not found.' };
+
+    if (targetUser.role === 'customer') {
+      return { success: false, error: 'Customer accounts cannot be granted staff module permissions.' };
+    }
+
+    if (isSupabaseConfigured) {
+      try {
+        const rowsToUpsert = Object.entries(permissions).map(([mod, canAccess]) => ({
+          user_id: userId,
+          module: mod,
+          can_access: canAccess,
+          updated_at: new Date().toISOString(),
+        }));
+
+        if (rowsToUpsert.length > 0) {
+          await supabase.from('user_permissions').upsert(rowsToUpsert, { onConflict: 'user_id,module' });
+        }
+      } catch (err) {
+        console.warn('Error saving permissions to Supabase:', err);
+      }
+    }
+
+    setAllProfiles((prev) =>
+      prev.map((p) => (p.id === userId ? { ...p, permissions: { ...permissions }, updated_at: new Date().toISOString() } : p))
+    );
+
+    if (profile?.id === userId) {
+      const updatedProf = { ...profile, permissions: { ...permissions } };
+      setProfile(updatedProf);
+      localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(updatedProf));
+    }
+
+    return { success: true };
+  };
+
+  // HAS PERMISSION CHECK
+  const hasPermission = (moduleId: string): boolean => {
+    if (!profile) return false;
+    if (profile.role === 'admin') return true;
+    if (profile.role === 'customer') {
+      return moduleId === 'storefront' || moduleId === 'customer-orders';
+    }
+
+    if (profile.permissions && typeof profile.permissions[moduleId] === 'boolean') {
+      return profile.permissions[moduleId];
+    }
+
+    // Default stock staff permissions if explicit map not set
+    if (profile.role === 'stock') {
+      return moduleId === 'inventory' || moduleId === 'b2c-pos';
+    }
+
+    return false;
   };
 
   // ADMIN RESET USER PASSWORD
@@ -593,8 +673,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         resetPasswordForEmail,
         adminCreateStaffUser,
         adminUpdateUser,
+        adminUpdateUserPermissions,
         adminResetUserPassword,
         adminToggleUserStatus,
+        hasPermission,
       }}
     >
       {children}

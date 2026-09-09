@@ -30,6 +30,24 @@ import { useStore } from '../context/StoreContext';
 import { useAuth } from '../context/AuthContext';
 import { AppRole, UserProfile } from '../types';
 
+export const ALL_CRM_MODULES = [
+  { id: 'dashboard', label: 'Dashboard', desc: 'Analytics & Overview' },
+  { id: 'products', label: 'Products Catalog', desc: 'Product Master Management' },
+  { id: 'inventory', label: 'Inventory', desc: 'Stock Control & Adjustments' },
+  { id: 'customer-orders', label: 'Customer Orders', desc: 'Customer Storefront Orders' },
+  { id: 'b2b-orders', label: 'B2B Wholesale Orders', desc: 'Dealer & Wholesale Orders' },
+  { id: 'quotations', label: 'Quotations', desc: 'B2B Quotations & Proposals' },
+  { id: 'invoices', label: 'Invoices', desc: 'GST Tax Invoices' },
+  { id: 'customers', label: 'Customers', desc: 'Customer Directory & Accounts' },
+  { id: 'b2c-pos', label: 'POS / Counter Sales', desc: 'Retail Counter Sales' },
+  { id: 'reports', label: 'Reports & Analytics', desc: 'Financial & Sales Reports' },
+  { id: 'storefront', label: 'Customer Storefront', desc: 'Shopping Storefront Catalog' },
+  { id: 'pricing', label: 'B2B Price Tiers', desc: 'Price Rules & Tiered Discounts' },
+  { id: 'payments', label: 'Payment Ledger', desc: 'Payment Collection Log' },
+  { id: 'audit-trail', label: 'Audit Trail', desc: 'System Audit Logs' },
+  { id: 'settings', label: 'Settings', desc: 'CRM System Configuration' },
+];
+
 export const SettingsView: React.FC = () => {
   const {
     isDemoMode,
@@ -44,6 +62,7 @@ export const SettingsView: React.FC = () => {
     payments,
     auditLogs,
     currentWarehouse,
+    logAudit,
   } = useStore();
 
   const {
@@ -51,6 +70,7 @@ export const SettingsView: React.FC = () => {
     allProfiles,
     adminCreateStaffUser,
     adminUpdateUser,
+    adminUpdateUserPermissions,
     adminResetUserPassword,
     adminToggleUserStatus,
   } = useAuth();
@@ -71,9 +91,17 @@ export const SettingsView: React.FC = () => {
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState<AppRole>('stock');
   const [newTempPassword, setNewTempPassword] = useState('');
+  const [newStaffPermissions, setNewStaffPermissions] = useState<Record<string, boolean>>({
+    inventory: true,
+    'b2c-pos': true,
+  });
   const [userActionError, setUserActionError] = useState<string | null>(null);
   const [userActionSuccess, setUserActionSuccess] = useState<string | null>(null);
   const [userActionLoading, setUserActionLoading] = useState(false);
+
+  // Manage Access Modal State for Admin
+  const [accessTargetUser, setAccessTargetUser] = useState<UserProfile | null>(null);
+  const [selectedPermissions, setSelectedPermissions] = useState<Record<string, boolean>>({});
 
   // Password Reset Modal State for Admin
   const [resetTargetUser, setResetTargetUser] = useState<UserProfile | null>(null);
@@ -142,22 +170,82 @@ export const SettingsView: React.FC = () => {
       email: newEmail,
       role: newRole,
       tempPassword: newTempPassword,
+      permissions: newRole === 'stock' ? newStaffPermissions : undefined,
     });
 
     setUserActionLoading(false);
 
     if (res.success) {
+      logAudit(
+        'CREATE_USER',
+        'System',
+        `Admin ${currentUserProfile?.full_name || 'Admin'} created staff user ${newFullName} (${newEmail}) with role ${newRole}`
+      );
       setUserActionSuccess(`User ${newFullName} (${newEmail}) created successfully.`);
       setNewFullName('');
       setNewEmail('');
       setNewRole('stock');
       setNewTempPassword('');
+      setNewStaffPermissions({ inventory: true, 'b2c-pos': true });
       setTimeout(() => {
         setUserActionSuccess(null);
         setIsAddUserOpen(false);
       }, 1500);
     } else {
       setUserActionError(res.error || 'Failed to create user.');
+    }
+  };
+
+  const handleOpenAccessModal = (u: UserProfile) => {
+    setAccessTargetUser(u);
+    const perms: Record<string, boolean> = {};
+    ALL_CRM_MODULES.forEach((mod) => {
+      if (u.permissions && typeof u.permissions[mod.id] === 'boolean') {
+        perms[mod.id] = u.permissions[mod.id];
+      } else if (u.role === 'stock') {
+        perms[mod.id] = mod.id === 'inventory' || mod.id === 'b2c-pos';
+      } else if (u.role === 'admin') {
+        perms[mod.id] = true;
+      } else {
+        perms[mod.id] = false;
+      }
+    });
+    setSelectedPermissions(perms);
+  };
+
+  const handleSelectAllPermissions = () => {
+    const allChecked: Record<string, boolean> = {};
+    ALL_CRM_MODULES.forEach((mod) => {
+      allChecked[mod.id] = true;
+    });
+    setSelectedPermissions(allChecked);
+  };
+
+  const handleClearAllPermissions = () => {
+    const allCleared: Record<string, boolean> = {};
+    ALL_CRM_MODULES.forEach((mod) => {
+      allCleared[mod.id] = false;
+    });
+    setSelectedPermissions(allCleared);
+  };
+
+  const handleSavePermissions = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!accessTargetUser) return;
+    setUserActionLoading(true);
+
+    const res = await adminUpdateUserPermissions(accessTargetUser.id, selectedPermissions);
+    setUserActionLoading(false);
+
+    if (res.success) {
+      logAudit(
+        'UPDATE_USER_PERMISSIONS',
+        'System',
+        `Admin ${currentUserProfile?.full_name || 'Admin'} changed permissions for ${accessTargetUser.full_name} (${accessTargetUser.email})`
+      );
+      setAccessTargetUser(null);
+    } else {
+      alert(res.error || 'Failed to update permissions');
     }
   };
 
@@ -315,6 +403,17 @@ export const SettingsView: React.FC = () => {
                     </td>
 
                     <td className="p-3.5 text-right pr-5 space-x-1.5">
+                      {/* Manage Access Button for Staff */}
+                      {u.role !== 'admin' && u.role !== 'customer' && (
+                        <button
+                          onClick={() => handleOpenAccessModal(u)}
+                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-[#E31B23] border border-red-200 rounded-lg text-[11px] font-bold transition-colors cursor-pointer"
+                          title="Manage Module Permissions"
+                        >
+                          Manage Access
+                        </button>
+                      )}
+
                       {/* Change Role Button */}
                       {u.email !== 'admin@gmail.com' && u.role !== 'customer' && (
                         <button
@@ -642,8 +741,8 @@ export const SettingsView: React.FC = () => {
       {/* ADMIN ADD USER MODAL */}
       {isAddUserOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150 space-y-4 max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-[#E31B23]" />
                 <h3 className="font-black text-slate-900 text-sm">Create Staff User Account</h3>
@@ -661,20 +760,20 @@ export const SettingsView: React.FC = () => {
             </div>
 
             {userActionError && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold flex items-center gap-2">
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold flex items-center gap-2 shrink-0">
                 <AlertTriangle className="w-4 h-4 text-[#E31B23] shrink-0" />
                 <span>{userActionError}</span>
               </div>
             )}
 
             {userActionSuccess && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2">
+              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2 shrink-0">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{userActionSuccess}</span>
               </div>
             )}
 
-            <form onSubmit={handleCreateUser} className="space-y-3 text-xs">
+            <form onSubmit={handleCreateUser} className="space-y-3 text-xs flex-1 overflow-y-auto pr-1">
               <div>
                 <label className="font-bold text-slate-700 block mb-1">Full Name</label>
                 <input
@@ -706,10 +805,34 @@ export const SettingsView: React.FC = () => {
                   onChange={(e) => setNewRole(e.target.value as AppRole)}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-[#E31B23] focus:outline-none"
                 >
-                  <option value="stock">Stock / Inventory Staff (Inventory Only)</option>
+                  <option value="stock">Stock Staff (Custom Checkbox Permissions)</option>
                   <option value="admin">Admin (Full CRM Access)</option>
                 </select>
               </div>
+
+              {newRole === 'stock' && (
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                  <label className="font-bold text-slate-800 block text-xs">Module Access Checkboxes:</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {ALL_CRM_MODULES.map((mod) => (
+                      <label key={mod.id} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={!!newStaffPermissions[mod.id]}
+                          onChange={(e) =>
+                            setNewStaffPermissions((prev) => ({
+                              ...prev,
+                              [mod.id]: e.target.checked,
+                            }))
+                          }
+                          className="w-3.5 h-3.5 rounded text-[#E31B23] focus:ring-[#E31B23] cursor-pointer"
+                        />
+                        <span className="text-slate-800 font-semibold text-[11px]">{mod.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="font-bold text-slate-700 block mb-1">Temporary Password</label>
@@ -723,7 +846,7 @@ export const SettingsView: React.FC = () => {
                 />
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div className="pt-2 flex justify-end gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsAddUserOpen(false)}
@@ -737,6 +860,106 @@ export const SettingsView: React.FC = () => {
                   className="px-4 py-2 bg-[#E31B23] hover:bg-[#B5121B] text-white font-bold rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
                 >
                   {userActionLoading ? 'Creating...' : 'Create User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN MANAGE ACCESS MODAL */}
+      {accessTargetUser && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-xl w-full shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150 space-y-4 max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-red-50 text-[#E31B23] flex items-center justify-center font-black">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
+                    <span>Manage Access — {accessTargetUser.full_name}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono">
+                      {accessTargetUser.email}
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Check or uncheck permissions to grant or restrict specific CRM modules for this staff member.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setAccessTargetUser(null)}
+                className="text-slate-400 hover:text-slate-600 font-bold text-xs cursor-pointer p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100 shrink-0 text-xs">
+              <span className="font-bold text-slate-700">Permission Presets:</span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleSelectAllPermissions}
+                  className="px-3 py-1 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                >
+                  Select All
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearAllPermissions}
+                  className="px-3 py-1 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                >
+                  Clear All
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSavePermissions} className="flex-1 overflow-y-auto pr-1 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {ALL_CRM_MODULES.map((mod) => (
+                  <label
+                    key={mod.id}
+                    className={`flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                      selectedPermissions[mod.id]
+                        ? 'bg-red-50/40 border-red-200 text-slate-900'
+                        : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!!selectedPermissions[mod.id]}
+                      onChange={(e) =>
+                        setSelectedPermissions((prev) => ({
+                          ...prev,
+                          [mod.id]: e.target.checked,
+                        }))
+                      }
+                      className="mt-0.5 w-4 h-4 rounded text-[#E31B23] focus:ring-[#E31B23] cursor-pointer"
+                    />
+                    <div>
+                      <span className="font-bold text-xs text-slate-900 block">{mod.label}</span>
+                      <span className="text-[11px] text-slate-500">{mod.desc}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setAccessTargetUser(null)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={userActionLoading}
+                  className="px-4 py-2 bg-[#E31B23] hover:bg-[#B5121B] text-white font-bold rounded-xl text-xs shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  {userActionLoading ? 'Saving...' : 'Save Permissions'}
                 </button>
               </div>
             </form>

@@ -6,10 +6,11 @@ import { AppRole } from '../../types';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: AppRole[];
+  moduleId?: string;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
-  const { profile, loading } = useAuth();
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles, moduleId }) => {
+  const { profile, loading, hasPermission } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -31,6 +32,17 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
   }
 
   const role = profile.role;
+
+  // Check module permission if moduleId provided
+  if (moduleId && !hasPermission(moduleId)) {
+    if (role === 'stock') {
+      return <Navigate to="/inventory" replace />;
+    }
+    if (role === 'customer') {
+      return <Navigate to="/store" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  }
 
   // Check allowed roles for specific route
   if (allowedRoles && !allowedRoles.includes(role)) {

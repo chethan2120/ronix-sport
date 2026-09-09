@@ -224,3 +224,25 @@ CREATE POLICY "Customers insert own order items" ON public.customer_order_items
     )
   );
 
+-- 8. USER PERMISSIONS Table & RLS
+CREATE TABLE IF NOT EXISTS public.user_permissions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  module TEXT NOT NULL,
+  can_access BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, module)
+);
+
+ALTER TABLE public.user_permissions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins full access to user permissions" ON public.user_permissions
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+CREATE POLICY "Users read own permissions" ON public.user_permissions
+  FOR SELECT USING (auth.uid() = user_id);
+
+

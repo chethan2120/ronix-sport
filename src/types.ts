@@ -12,6 +12,7 @@ export interface UserProfile {
   created_at?: string;
   updated_at?: string;
   last_login?: string;
+  permissions?: Record<string, boolean>;
 }
 
 export interface User {

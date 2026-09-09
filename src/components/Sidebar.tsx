@@ -42,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, setMobileOpen }) =
     toggleDemoMode,
   } = useStore();
 
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, hasPermission } = useAuth();
   const navigate = useNavigate();
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -52,33 +52,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, setMobileOpen }) =
     return null;
   }
 
-  const role = profile?.role || 'admin';
-
-  // Primary navigation items filtered by role
+  // Primary navigation items filtered by permission
   const allPrimaryNavItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin'] },
-    { id: 'products', label: 'Products', icon: Package, roles: ['admin', 'stock'] },
-    { id: 'inventory', label: 'Inventory', icon: Boxes, roles: ['admin', 'stock'] },
-    { id: 'customer-orders', label: 'Customer Orders', icon: ShoppingBag, isNew: true, roles: ['admin'] },
-    { id: 'b2b-orders', label: 'B2B Orders', icon: ShoppingCart, roles: ['admin'] },
-    { id: 'quotations', label: 'Quotations', icon: FileSpreadsheet, roles: ['admin'] },
-    { id: 'invoices', label: 'Invoices', icon: FileText, roles: ['admin'] },
-    { id: 'customers', label: 'Customers', icon: Users, roles: ['admin'] },
-    { id: 'b2c-pos', label: 'POS / Counter Sales', icon: Receipt, roles: ['admin'] },
-    { id: 'reports', label: 'Reports', icon: BarChart3, roles: ['admin'] },
-    { id: 'storefront', label: 'Customer Storefront', icon: Store, roles: ['admin'] },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'products', label: 'Products', icon: Package },
+    { id: 'inventory', label: 'Inventory', icon: Boxes },
+    { id: 'customer-orders', label: 'Customer Orders', icon: ShoppingBag, isNew: true },
+    { id: 'b2b-orders', label: 'B2B Orders', icon: ShoppingCart },
+    { id: 'quotations', label: 'Quotations', icon: FileSpreadsheet },
+    { id: 'invoices', label: 'Invoices', icon: FileText },
+    { id: 'customers', label: 'Customers', icon: Users },
+    { id: 'b2c-pos', label: 'POS / Counter Sales', icon: Receipt },
+    { id: 'reports', label: 'Reports', icon: BarChart3 },
+    { id: 'storefront', label: 'Customer Storefront', icon: Store },
   ];
 
-  // Secondary management items filtered by role
+  // Secondary management items filtered by permission
   const allSecondaryNavItems = [
-    { id: 'pricing', label: 'B2B Price Tiers', icon: Tag, roles: ['admin'] },
-    { id: 'payments', label: 'Payment Ledger', icon: CreditCard, roles: ['admin'] },
-    { id: 'audit-trail', label: 'Audit Trail', icon: History, roles: ['admin'] },
-    { id: 'settings', label: 'Settings', icon: Settings, roles: ['admin'] },
+    { id: 'pricing', label: 'B2B Price Tiers', icon: Tag },
+    { id: 'payments', label: 'Payment Ledger', icon: CreditCard },
+    { id: 'audit-trail', label: 'Audit Trail', icon: History },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
-  const primaryNavItems = allPrimaryNavItems.filter((item) => item.roles.includes(role));
-  const secondaryNavItems = allSecondaryNavItems.filter((item) => item.roles.includes(role));
+  const primaryNavItems = allPrimaryNavItems.filter((item) => hasPermission(item.id));
+  const secondaryNavItems = allSecondaryNavItems.filter((item) => hasPermission(item.id));
 
   const handleNavClick = (tabId: string) => {
     setActiveTab(tabId);

@@ -149,7 +149,7 @@ const CrmLayout: React.FC = () => {
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="dashboard" allowedRoles={['admin']}>
                   <DashboardView
                     onOpenAddProductModal={() => setIsAddProductOpen(true)}
                     onOpenRecordPaymentModal={() => setIsRecordPaymentOpen(true)}
@@ -163,7 +163,7 @@ const CrmLayout: React.FC = () => {
             <Route
               path="/inventory"
               element={
-                <ProtectedRoute allowedRoles={['admin', 'stock']}>
+                <ProtectedRoute moduleId="inventory" allowedRoles={['admin', 'stock']}>
                   <InventoryView
                     onOpenAddProductModal={() => setIsAddProductOpen(true)}
                     onOpenAddStockModal={handleOpenAddStock}
@@ -177,7 +177,7 @@ const CrmLayout: React.FC = () => {
             <Route
               path="/products"
               element={
-                <ProtectedRoute allowedRoles={['admin', 'stock']}>
+                <ProtectedRoute moduleId="products" allowedRoles={['admin', 'stock']}>
                   <ProductsView
                     onOpenAddProductModal={() => setIsAddProductOpen(true)}
                     onOpenAdjustStockModal={handleOpenAddStock}
@@ -186,121 +186,121 @@ const CrmLayout: React.FC = () => {
               }
             />
 
-            {/* Customer Orders (Admin Only) */}
+            {/* Customer Orders */}
             <Route
               path="/customer-orders"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="customer-orders" allowedRoles={['admin']}>
                   <CustomerOrdersView />
                 </ProtectedRoute>
               }
             />
 
-            {/* B2B Orders (Admin Only) */}
+            {/* B2B Orders */}
             <Route
               path="/b2b-orders"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="b2b-orders" allowedRoles={['admin']}>
                   <B2BOrderFlowView />
                 </ProtectedRoute>
               }
             />
 
-            {/* Quotations (Admin Only) */}
+            {/* Quotations */}
             <Route
               path="/quotations"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="quotations" allowedRoles={['admin']}>
                   <QuotationsView />
                 </ProtectedRoute>
               }
             />
 
-            {/* Invoices (Admin Only) */}
+            {/* Invoices */}
             <Route
               path="/invoices"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="invoices" allowedRoles={['admin']}>
                   <InvoicesView />
                 </ProtectedRoute>
               }
             />
 
-            {/* Customers (Admin Only) */}
+            {/* Customers */}
             <Route
               path="/customers"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="customers" allowedRoles={['admin']}>
                   <CustomersView />
                 </ProtectedRoute>
               }
             />
 
-            {/* POS (Admin Only) */}
+            {/* POS */}
             <Route
               path="/b2c-pos"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="b2c-pos" allowedRoles={['admin', 'stock']}>
                   <B2CPosView />
                 </ProtectedRoute>
               }
             />
 
-            {/* Reports (Admin Only) */}
+            {/* Reports */}
             <Route
               path="/reports"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="reports" allowedRoles={['admin']}>
                   <ReportsView />
                 </ProtectedRoute>
               }
             />
 
-            {/* Pricing Tiers (Admin Only) */}
+            {/* Pricing Tiers */}
             <Route
               path="/pricing"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="pricing" allowedRoles={['admin']}>
                   <PricingRulesView />
                 </ProtectedRoute>
               }
             />
 
-            {/* Payments (Admin Only) */}
+            {/* Payments */}
             <Route
               path="/payments"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="payments" allowedRoles={['admin']}>
                   <PaymentsView onOpenRecordPaymentModal={() => setIsRecordPaymentOpen(true)} />
                 </ProtectedRoute>
               }
             />
 
-            {/* Audit Trail (Admin Only) */}
+            {/* Audit Trail */}
             <Route
               path="/audit-trail"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="audit-trail" allowedRoles={['admin']}>
                   <AuditTrailView />
                 </ProtectedRoute>
               }
             />
 
-            {/* Settings & User Management (Admin Only) */}
+            {/* Settings & User Management */}
             <Route
               path="/settings"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute moduleId="settings" allowedRoles={['admin']}>
                   <SettingsView />
                 </ProtectedRoute>
               }
             />
 
-            {/* Customer Storefront (Admin & Customer) */}
+            {/* Customer Storefront */}
             <Route
               path="/store"
               element={
-                <ProtectedRoute allowedRoles={['admin', 'customer']}>
+                <ProtectedRoute moduleId="storefront" allowedRoles={['admin', 'stock', 'customer']}>
                   <CustomerStorefront />
                 </ProtectedRoute>
               }
@@ -308,7 +308,7 @@ const CrmLayout: React.FC = () => {
             <Route
               path="/customer-storefront"
               element={
-                <ProtectedRoute allowedRoles={['admin', 'customer']}>
+                <ProtectedRoute moduleId="storefront" allowedRoles={['admin', 'stock', 'customer']}>
                   <CustomerStorefront />
                 </ProtectedRoute>
               }
