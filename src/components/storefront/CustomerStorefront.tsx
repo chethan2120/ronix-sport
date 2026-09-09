@@ -394,6 +394,39 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
     );
   };
 
+  // Render Product Section Grid dynamically based on item count
+  const renderProductSectionGrid = (productList: Product[]) => {
+    if (!productList || productList.length === 0) {
+      return <p className="text-xs text-slate-500 font-medium py-2">No products currently available.</p>;
+    }
+    if (productList.length === 1) {
+      return (
+        <div className="w-full max-w-xs">
+          {renderProductCard(productList[0])}
+        </div>
+      );
+    }
+    if (productList.length === 2) {
+      return (
+        <div className="grid grid-cols-2 max-w-xl gap-4 sm:gap-5">
+          {productList.map((prod) => renderProductCard(prod))}
+        </div>
+      );
+    }
+    if (productList.length === 3) {
+      return (
+        <div className="grid grid-cols-2 sm:grid-cols-3 max-w-3xl gap-4 sm:gap-5">
+          {productList.map((prod) => renderProductCard(prod))}
+        </div>
+      );
+    }
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
+        {productList.map((prod) => renderProductCard(prod))}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-24 md:pb-12 overflow-x-hidden">
       {/* BRAND IDENTITY CUSTOMER HEADER */}
