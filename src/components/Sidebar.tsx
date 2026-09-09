@@ -52,6 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, setMobileOpen }) =
     return null;
   }
 
+  const role = profile?.role || 'admin';
+
   // Primary navigation items filtered by permission
   const allPrimaryNavItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },

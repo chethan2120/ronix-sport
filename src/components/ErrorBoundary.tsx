@@ -38,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 The application encountered an unexpected runtime issue.
               </p>
             </div>
-            {this.state.error?.message && (
+            {import.meta.env.DEV && this.state.error?.message && (
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-left font-mono text-[11px] text-red-600 overflow-x-auto max-h-24">
                 {this.state.error.message}
               </div>
