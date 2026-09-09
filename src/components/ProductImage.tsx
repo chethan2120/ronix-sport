@@ -65,6 +65,21 @@ const getCategoryDetails = (category?: string, name?: string) => {
   return { icon: Package, label: category || 'Ronix Sports', bg: 'from-slate-100 to-slate-200', color: 'text-slate-700' };
 };
 
+const formatImageSrc = (src?: string | null): string | null => {
+  if (!src) return null;
+  const str = src.trim();
+  if (str.startsWith('<svg')) {
+    return `data:image/svg+xml;utf8,${encodeURIComponent(str)}`;
+  }
+  if (str.startsWith('data:image/svg+xml;utf8,')) {
+    const rawSvg = str.replace('data:image/svg+xml;utf8,', '');
+    if (rawSvg.startsWith('<svg') || rawSvg.includes('<svg')) {
+      return `data:image/svg+xml;utf8,${encodeURIComponent(rawSvg)}`;
+    }
+  }
+  return str;
+};
+
 export const ProductImage: React.FC<ProductImageProps> = ({
   src,
   alt,
@@ -94,9 +109,11 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   // User-uploaded images (Base64 data URLs or custom URLs) take #1 priority.
   // Legacy unsplash URLs or missing images resolve to exact SKU/Product Type asset.
   const isCustomUserImage = Boolean(rawSrc && !rawSrc.includes('unsplash.com'));
-  const imageSrc = isCustomUserImage
+  const rawImageSrc = isCustomUserImage
     ? rawSrc
     : (skuAsset || (rawSrc && !rawSrc.includes('unsplash.com') ? rawSrc : null));
+
+  const imageSrc = formatImageSrc(rawImageSrc);
 
   const imageAlt = alt || product?.name || 'Ronix Sports Equipment';
 

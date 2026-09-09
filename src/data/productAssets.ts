@@ -450,7 +450,8 @@ export const getSkuProductAsset = (sku?: string, fallbackCategory?: string, fall
 
   if (queryText.includes('bat')) return PRODUCT_ASSETS['BAT-EW-2.6'];
   if (queryText.includes('ball')) return PRODUCT_ASSETS['BAL-LTH-01'];
+  if (queryText.includes('bag')) return PRODUCT_ASSETS['BAG-KIT-04'];
 
-  return null;
+  return PRODUCT_ASSETS['BAT-EW-2.6'];
 };
 

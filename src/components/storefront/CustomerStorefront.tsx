@@ -21,7 +21,7 @@ import {
   ArrowLeft,
   Calendar,
 } from 'lucide-react';
-import { useStore } from '../../context/StoreContext';
+import { useStore, normalizeCategory } from '../../context/StoreContext';
 import { useAuth } from '../../context/AuthContext';
 import { Product, CustomerOrder } from '../../types';
 import { ProductImage } from '../ProductImage';
@@ -66,35 +66,39 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = () => {
   const [orderError, setOrderError] = useState<string | null>(null);
   const [selectedMyOrder, setSelectedMyOrder] = useState<CustomerOrder | null>(null);
 
-  // 1. Dynamic Categories list (Defaults + Store Categories + Product Categories)
+  // 1. Dynamic Categories list (Canonical Categories)
   const allCategories = useMemo(() => {
-    const map = new Map<string, string>();
-    (storeCategories || []).forEach((c) => {
-      if (c) map.set(c.toLowerCase(), c);
-    });
+    const set = new Set<string>([
+      'Bats',
+      'Balls',
+      'Helmets',
+      'Gloves',
+      'Pads',
+      'Bags',
+      'Footwear',
+      'Football',
+      'Badminton',
+      'Basketball',
+      'Fitness',
+      'Accessories',
+    ]);
     (products || []).forEach((p) => {
-      if (p?.category) map.set(p.category.toLowerCase(), p.category);
+      if (p?.category) set.add(normalizeCategory(p.category));
     });
-    return ['All Gear', ...Array.from(map.values())];
-  }, [storeCategories, products]);
+    return ['All Gear', ...Array.from(set)];
+  }, [products]);
 
-  // 2. Dynamic Available Product Types for the selected Category scope
+  // 2. Dynamic Available Product Types for the selected Category scope (ONLY when specific category is selected)
   const availableProductTypes = useMemo(() => {
-    const predefined = getTypesForCategory(selectedCategory);
+    if (selectedCategory === 'All Gear') return [];
+
+    const normSelCat = normalizeCategory(selectedCategory);
+    const predefined = getTypesForCategory(normSelCat);
     const typesSet = new Set<string>(predefined);
 
-    // Include any custom productTypes attached to products in this category
     (products || []).forEach((p) => {
       if (!p?.productType) return;
-      const prodCat = (p.category || '').toLowerCase();
-      const selCat = selectedCategory.toLowerCase();
-
-      if (selectedCategory === 'All Gear' || selectedCategory === 'All') {
-        typesSet.add(p.productType);
-      } else if (
-        prodCat === selCat ||
-        ((selCat === 'cricket bats' || selCat === 'bats') && (prodCat === 'bats' || prodCat === 'cricket bats'))
-      ) {
+      if (normalizeCategory(p.category) === normSelCat) {
         typesSet.add(p.productType);
       }
     });
@@ -110,18 +114,13 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = () => {
     );
   }, [availableProductTypes, typeSearchQuery]);
 
-  // Product Counts per Category (for sidebar badges)
+  // Product Counts per Category (Normalized directly from actual products array)
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { 'All Gear': products.length };
-    products.forEach((p) => {
+    (products || []).forEach((p) => {
       if (!p?.category) return;
-      const catKey = p.category;
-      counts[catKey] = (counts[catKey] || 0) + 1;
-      // Handle alias matching count
-      if (p.category.toLowerCase() === 'bats' || p.category.toLowerCase() === 'cricket bats') {
-        counts['Cricket Bats'] = (counts['Cricket Bats'] || 0) + 1;
-        counts['Bats'] = (counts['Bats'] || 0) + 1;
-      }
+      const normCat = normalizeCategory(p.category);
+      counts[normCat] = (counts[normCat] || 0) + 1;
     });
     return counts;
   }, [products]);
@@ -129,7 +128,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = () => {
   // Product Counts per Product Type / Subcategory
   const productTypeCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    products.forEach((p) => {
+    (products || []).forEach((p) => {
       if (!p?.productType) return;
       counts[p.productType] = (counts[p.productType] || 0) + 1;
     });
@@ -183,19 +182,13 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = () => {
   const filteredProducts = useMemo(() => {
     return (products || []).filter((prod) => {
       if (!prod) return false;
-      const prodCat = (prod.category || '').toLowerCase();
-      const selCat = selectedCategory.toLowerCase();
+      const prodCat = normalizeCategory(prod.category);
+      const selCat = normalizeCategory(selectedCategory);
 
       // Category check
-      let matchesCategory = false;
-      if (selectedCategory === 'All Gear' || selectedCategory === 'All') {
-        matchesCategory = true;
-      } else if ((selCat === 'cricket bats' || selCat === 'bats') && (prodCat === 'bats' || prodCat === 'cricket bats')) {
-        matchesCategory = true;
-      } else {
-        matchesCategory = prodCat === selCat;
+      if (selectedCategory !== 'All Gear' && prodCat !== selCat) {
+        return false;
       }
-      if (!matchesCategory) return false;
 
       // Product Type / Subcategory check
       if (selectedProductTypes.length > 0) {
