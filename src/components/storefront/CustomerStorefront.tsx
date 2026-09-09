@@ -81,6 +81,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
   // Hero Banners Carousel Index
   const [heroIndex, setHeroIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState(0);
 
   const heroSlides = [
     {
@@ -990,26 +991,74 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
           </section>
 
           {/* CRICKET ESSENTIALS SECTION */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200/80 pb-3">
+              <div>
+                <span className="text-xs font-black text-[#E31B23] uppercase tracking-widest block">SEASON SPECIAL</span>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight flex items-center gap-2">
+                  🏏 CRICKET ESSENTIALS
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                  Match-ready bats, balls, protective equipment, and training essentials for every level of cricket.
+                </p>
+              </div>
+              <button
+                onClick={() => handleSelectCategory('Cricket')}
+                className="text-xs font-bold text-[#E31B23] hover:underline flex items-center gap-1 cursor-pointer shrink-0"
+              >
+                <span>View All Cricket Gear</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
             <div className="bg-white rounded-3xl border border-slate-200/90 shadow-md p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               {/* Left Promo Box */}
-              <div className="lg:col-span-4 bg-gradient-to-br from-[#E31B23] to-[#800A0F] rounded-2xl p-6 sm:p-8 text-white space-y-6 shadow-lg flex flex-col justify-between h-full">
-                <div className="space-y-3">
+              <div className="lg:col-span-4 bg-gradient-to-br from-[#E31B23] via-[#B5121B] to-[#800A0F] rounded-2xl p-6 sm:p-8 text-white shadow-lg flex flex-col justify-between h-full min-h-[380px] space-y-6">
+                <div className="space-y-4">
                   <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full border border-white/20 inline-block">
-                    SEASON SPECIAL
+                    MATCH READY DEALS
                   </span>
-                  <h3 className="text-2xl sm:text-3xl font-black leading-tight tracking-tight">🏏 CRICKET ESSENTIALS</h3>
+                  <h3 className="text-2xl sm:text-3xl font-black leading-tight tracking-tight">
+                    EQUIPMENT FOR CHAMPIONS
+                  </h3>
                   <p className="text-xs sm:text-sm text-white/90 font-medium leading-relaxed">
-                    Everything you need for training, match day, and team practice—from bats and balls to protective gear.
+                    Designed for peak performance from net practice to match day.
                   </p>
+
+                  {/* 3 Benefit Points */}
+                  <div className="space-y-2.5 pt-2">
+                    <div className="flex items-center gap-2.5 bg-black/20 backdrop-blur-xs px-3 py-2 rounded-xl border border-white/10">
+                      <ShieldCheck className="w-4 h-4 text-amber-300 shrink-0" />
+                      <span className="text-xs font-bold text-white">Match-Ready Quality</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 bg-black/20 backdrop-blur-xs px-3 py-2 rounded-xl border border-white/10">
+                      <Tag className="w-4 h-4 text-emerald-300 shrink-0" />
+                      <span className="text-xs font-bold text-white">Bulk B2B Pricing Available</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 bg-black/20 backdrop-blur-xs px-3 py-2 rounded-xl border border-white/10">
+                      <Truck className="w-4 h-4 text-sky-300 shrink-0" />
+                      <span className="text-xs font-bold text-white">Fast Nationwide Delivery</span>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Mini Equipment Collage Graphic */}
+                <div className="relative py-2 flex items-center justify-center">
+                  <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-sm p-3.5 rounded-2xl border border-white/20 shadow-inner">
+                    <span className="text-2xl hover:scale-125 transition-transform cursor-default" title="Cricket Bat">🏏</span>
+                    <span className="text-2xl hover:scale-125 transition-transform cursor-default" title="Cricket Ball">⚾</span>
+                    <span className="text-2xl hover:scale-125 transition-transform cursor-default" title="Helmet">🪖</span>
+                    <span className="text-2xl hover:scale-125 transition-transform cursor-default" title="Protective Pads">🛡️</span>
+                  </div>
+                </div>
+
                 <div>
                   <button
                     onClick={() => handleSelectCategory('Cricket')}
-                    className="w-full py-3.5 rounded-xl bg-white text-[#111827] font-black text-xs sm:text-sm hover:bg-slate-100 transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-xl bg-white text-[#111827] font-black text-xs sm:text-sm hover:bg-slate-100 transition-all shadow-md cursor-pointer flex items-center justify-center gap-2 group"
                   >
                     <span>View All Cricket Gear</span>
-                    <ArrowRight className="w-4 h-4 text-[#E31B23]" />
+                    <ArrowRight className="w-4 h-4 text-[#E31B23] group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
               </div>
@@ -1023,7 +1072,18 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
           {/* SPORTS CATALOGUE BOOK-STYLE SLIDER SECTION */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 transition-all duration-500 shadow-md ${bookSlides[bookSlideIndex].bgTint}`}>
+            <div
+              onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+              onTouchEnd={(e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                if (touchStartX - touchEndX > 50) {
+                  setBookSlideIndex((prev) => (prev < bookSlides.length - 1 ? prev + 1 : 0));
+                } else if (touchEndX - touchStartX > 50) {
+                  setBookSlideIndex((prev) => (prev > 0 ? prev - 1 : bookSlides.length - 1));
+                }
+              }}
+              className={`rounded-3xl border p-6 sm:p-8 space-y-6 transition-all duration-500 shadow-md ${bookSlides[bookSlideIndex].bgTint}`}
+            >
               {/* Top Header & Page Controls */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
                 <div>
@@ -1046,7 +1106,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                 <div className="flex items-center space-x-3 shrink-0">
                   <button
                     onClick={() => setBookSlideIndex((prev) => (prev > 0 ? prev - 1 : bookSlides.length - 1))}
-                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
                     title="Previous Catalogue Page"
                   >
                     <ChevronLeft className="w-5 h-5" />
@@ -1066,7 +1126,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
                   <button
                     onClick={() => setBookSlideIndex((prev) => (prev < bookSlides.length - 1 ? prev + 1 : 0))}
-                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
                     title="Next Catalogue Page"
                   >
                     <ChevronRight className="w-5 h-5" />

@@ -70,19 +70,20 @@ export const PRODUCT_ASSETS: Record<string, string> = {
   "SPT-CAP-007": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&auto=format&fit=crop&q=80",
   "SPT-WRB-008": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=80",
 
-  "CRK-BAT-001": "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&auto=format&fit=crop&q=80",
-  "CRK-BAT-002": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&auto=format&fit=crop&q=80",
+  // Legacy SKUs mapping to clean product photos
+  "CRK-BAT-001": "https://images.unsplash.com/photo-1560012057-4372e14c5085?w=800&auto=format&fit=crop&q=80",
+  "CRK-BAT-002": "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800&auto=format&fit=crop&q=80",
   "CRK-BAL-003": "https://images.unsplash.com/photo-1589801258579-18e091f4ca26?w=800&auto=format&fit=crop&q=80",
   "CRK-HLM-005": "https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=800&auto=format&fit=crop&q=80",
   "CRK-GLV-006": "https://images.unsplash.com/photo-1563299796-b729d0af54a5?w=800&auto=format&fit=crop&q=80",
-  "CRK-PAD-007": "https://images.unsplash.com/photo-1512716676801-e7fcd9384d53?w=800&auto=format&fit=crop&q=80",
+  "CRK-PAD-007": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=800&auto=format&fit=crop&q=80",
   "FTB-BAL-011": "https://images.unsplash.com/photo-1614632537190-23e4146777db?w=800&auto=format&fit=crop&q=80",
   "FTB-SHO-013": "https://images.unsplash.com/photo-1511886929837-354d827aae26?w=800&auto=format&fit=crop&q=80",
   "BAD-RCT-021": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&auto=format&fit=crop&q=80",
   "FIT-DMB-031": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&auto=format&fit=crop&q=80"
 };
 
-export const RASTER_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&auto=format&fit=crop&q=80';
+export const RASTER_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1589801258579-18e091f4ca26?w=800&auto=format&fit=crop&q=80';
 
 export function getSkuProductAsset(sku?: string, category?: string, name?: string, productType?: string): string {
   if (sku && PRODUCT_ASSETS[sku]) {
@@ -93,6 +94,7 @@ export function getSkuProductAsset(sku?: string, category?: string, name?: strin
   const cat = (category || '').toLowerCase();
   const pt = (productType || '').toLowerCase();
 
+  // Cricket
   if (n.includes('english willow') || (n.includes('cricket') && n.includes('bat'))) {
     return PRODUCT_ASSETS['CRI-BAT-EW-002'];
   }
@@ -111,7 +113,7 @@ export function getSkuProductAsset(sku?: string, category?: string, name?: strin
   if (n.includes('gloves') && (n.includes('batting') || cat.includes('cricket'))) {
     return PRODUCT_ASSETS['CRI-GLV-003'];
   }
-  if (n.includes('pads') || pt.includes('pad')) {
+  if (n.includes('pad') || pt.includes('pad') || cat.includes('cricket')) {
     return PRODUCT_ASSETS['CRI-PAD-004'];
   }
   if (n.includes('kit bag') || n.includes('duffle')) {
@@ -120,6 +122,8 @@ export function getSkuProductAsset(sku?: string, category?: string, name?: strin
   if (n.includes('stumps')) {
     return PRODUCT_ASSETS['CRI-STP-011'];
   }
+
+  // Football
   if (n.includes('football shoes') || n.includes('cleats') || n.includes('stud')) {
     return PRODUCT_ASSETS['FOO-SHO-002'];
   }
@@ -132,24 +136,24 @@ export function getSkuProductAsset(sku?: string, category?: string, name?: strin
   if (n.includes('football') || n.includes('futsal')) {
     return PRODUCT_ASSETS['FOO-BAL-001'];
   }
-  if (n.includes('badminton racket') || n.includes('aerospeed')) {
+
+  // Badminton
+  if (n.includes('badminton racket') || n.includes('aerospeed') || cat.includes('badminton')) {
     return PRODUCT_ASSETS['BAD-RAC-YON-001'];
   }
   if (n.includes('shuttlecock')) {
     return PRODUCT_ASSETS['BAD-SHU-NYL-003'];
   }
-  if (n.includes('table tennis bat') || n.includes('ping pong paddle')) {
+
+  // Table Tennis
+  if (n.includes('table tennis bat') || n.includes('ping pong paddle') || cat.includes('table tennis')) {
     return PRODUCT_ASSETS['TT-BAT-001'];
   }
   if (n.includes('table tennis ball') || n.includes('ping pong ball')) {
     return PRODUCT_ASSETS['TT-BAL-002'];
   }
-  if (n.includes('basketball')) {
-    return PRODUCT_ASSETS['BAS-BAL-001'];
-  }
-  if (n.includes('volleyball')) {
-    return PRODUCT_ASSETS['VOL-BAL-001'];
-  }
+
+  // Fitness
   if (n.includes('dumbbell')) {
     return PRODUCT_ASSETS['FIT-DUM-003'];
   }
@@ -159,6 +163,8 @@ export function getSkuProductAsset(sku?: string, category?: string, name?: strin
   if (n.includes('yoga mat') || n.includes('exercise mat')) {
     return PRODUCT_ASSETS['FIT-MAT-001'];
   }
+
+  // Sportswear
   if (n.includes('running shoes') || n.includes('sneakers')) {
     return PRODUCT_ASSETS['SPT-SHO-004'];
   }
