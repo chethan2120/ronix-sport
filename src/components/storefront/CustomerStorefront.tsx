@@ -712,79 +712,140 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
         />
       ) : activeTab === 'home' ? (
         <main className="space-y-10 sm:space-y-12">
-          {/* HERO CAROUSEL SECTION */}
+          {/* HIGH-IMPACT PREMIUM HERO SECTION */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-            <div className={`relative rounded-3xl overflow-hidden shadow-xl text-white ${heroSlides[heroIndex].bg} transition-all duration-500 min-h-[300px] sm:min-h-[360px] flex items-center`}>
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 sm:p-10 w-full items-center">
-                {/* Left Text Column */}
-                <div className="lg:col-span-7 space-y-4 z-10">
-                  <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs font-black tracking-widest uppercase">
-                    <span>{heroSlides[heroIndex].badge}</span>
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-[#0B0F17] text-white border border-slate-800/80 min-h-[460px] md:min-h-[520px] flex items-center">
+              {/* Background Ambient Red Radial Glows & Grid Pattern */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-600/25 via-[#990B11]/15 to-transparent pointer-events-none" />
+              <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-[#E31B23]/10 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 sm:p-10 lg:p-12 w-full items-center relative z-10">
+                {/* Left Content Column */}
+                <div className="lg:col-span-7 space-y-6">
+                  {/* Badge */}
+                  <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-black tracking-widest text-red-400 uppercase shadow-xs">
+                    <Trophy className="w-3.5 h-3.5 text-[#E31B23]" />
+                    <span>RONIX OFFICIAL STORE</span>
                   </div>
 
-                  <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight uppercase">
-                    {heroSlides[heroIndex].headline}
+                  {/* Headline */}
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none uppercase text-white">
+                    PLAY HARD. <br className="hidden sm:inline" />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-red-400">
+                      GEAR SMART.
+                    </span>
                   </h1>
 
-                  <p className="text-sm sm:text-base text-white/80 font-medium max-w-lg">
-                    {heroSlides[heroIndex].subtext}
+                  {/* Supporting text */}
+                  <p className="text-sm sm:text-base text-slate-300 font-medium max-w-xl leading-relaxed">
+                    Premium sports equipment, team supplies, and fitness essentials for every level of play.
                   </p>
 
-                  <div className="flex items-center space-x-3 pt-2">
+                  {/* CTAs */}
+                  <div className="flex flex-wrap items-center gap-3.5 pt-1">
                     <button
-                      onClick={() => handleSelectCategory(heroSlides[heroIndex].category)}
-                      className="px-6 py-3 rounded-full bg-white text-[#111827] font-black text-xs sm:text-sm hover:bg-slate-100 transition-all shadow-lg hover:scale-105 cursor-pointer flex items-center gap-2"
+                      onClick={() => {
+                        handleSelectCategory('All Gear');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="px-7 py-3.5 rounded-xl bg-[#E31B23] hover:bg-[#B5121B] text-white font-black text-xs sm:text-sm shadow-xl shadow-red-600/30 hover:shadow-red-600/50 transition-all cursor-pointer flex items-center gap-2 group active:scale-95"
                     >
-                      <span>{heroSlides[heroIndex].cta}</span>
-                      <ArrowRight className="w-4 h-4 text-[#E31B23]" />
+                      <span>Shop All Gear</span>
+                      <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
                     </button>
+
                     <button
-                      onClick={() => handleSelectCategory('All Gear')}
-                      className="px-5 py-3 rounded-full bg-black/30 hover:bg-black/40 text-white font-extrabold text-xs sm:text-sm transition-all border border-white/20 cursor-pointer"
+                      onClick={() => {
+                        setActiveTab('category');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-extrabold text-xs sm:text-sm border border-white/20 transition-all cursor-pointer flex items-center gap-2 active:scale-95"
                     >
-                      Explore All Gear
+                      <span>Explore Categories</span>
+                      <ChevronRight className="w-4 h-4 text-slate-300" />
                     </button>
+                  </div>
+
+                  {/* Compact Trust Row */}
+                  <div className="pt-4 border-t border-white/10 grid grid-cols-3 gap-3 max-w-lg">
+                    <div className="flex items-center space-x-2 text-slate-300">
+                      <ShieldCheck className="w-4 h-4 text-[#E31B23] shrink-0" />
+                      <span className="text-[11px] sm:text-xs font-bold leading-tight">Premium Quality Equipment</span>
+                    </div>
+
+                    <div className="flex items-center space-x-2 text-slate-300">
+                      <Award className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span className="text-[11px] sm:text-xs font-bold leading-tight">B2B Bulk Pricing</span>
+                    </div>
+
+                    <div className="flex items-center space-x-2 text-slate-300">
+                      <Truck className="w-4 h-4 text-sky-400 shrink-0" />
+                      <span className="text-[11px] sm:text-xs font-bold leading-tight">Fast Support</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Right Photo Artwork Column */}
-                <div className="lg:col-span-5 hidden lg:flex items-center justify-center p-2 h-[260px] sm:h-[300px]">
-                  <img
-                    src={heroSlides[heroIndex].image}
-                    alt={heroSlides[heroIndex].headline}
-                    className="w-full h-full object-contain filter drop-shadow-2xl rounded-2xl"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                {/* Right Equipment Visual Composition */}
+                <div className="lg:col-span-5 hidden lg:flex flex-col items-center justify-center relative">
+                  <div className="w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 shadow-2xl space-y-4 relative overflow-hidden group">
+                    {/* Top Composition Badge */}
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        MATCH READY PRO GEAR
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-950/80 text-red-400 border border-red-800/60">
+                        100% GENUINE
+                      </span>
+                    </div>
+
+                    {/* 2x2 Product Equipment Matrix (Clean Product-Only Studio Photos) */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Tile 1: Cricket Bat */}
+                      <div className="bg-white rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-xs hover:scale-105 transition-transform duration-300">
+                        <img
+                          src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=400&auto=format&fit=crop&q=80"
+                          alt="Cricket Bat"
+                          className="w-full h-20 object-contain"
+                          loading="lazy"
+                        />
+                        <span className="text-[10px] font-black text-slate-800 mt-1">Cricket Bat</span>
+                      </div>
+
+                      {/* Tile 2: Match Football */}
+                      <div className="bg-white rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-xs hover:scale-105 transition-transform duration-300">
+                        <img
+                          src="https://images.unsplash.com/photo-1614632537190-23e4146777db?w=400&auto=format&fit=crop&q=80"
+                          alt="Pro Football"
+                          className="w-full h-20 object-contain"
+                          loading="lazy"
+                        />
+                        <span className="text-[10px] font-black text-slate-800 mt-1">Match Football</span>
+                      </div>
+
+                      {/* Tile 3: Badminton Racket */}
+                      <div className="bg-white rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-xs hover:scale-105 transition-transform duration-300">
+                        <img
+                          src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80"
+                          alt="Badminton Racket"
+                          className="w-full h-20 object-contain"
+                          loading="lazy"
+                        />
+                        <span className="text-[10px] font-black text-slate-800 mt-1">Pro Racket</span>
+                      </div>
+
+                      {/* Tile 4: Hex Dumbbell */}
+                      <div className="bg-white rounded-2xl p-2.5 h-28 flex flex-col items-center justify-center border border-slate-200/80 relative shadow-xs hover:scale-105 transition-transform duration-300">
+                        <img
+                          src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&auto=format&fit=crop&q=80"
+                          alt="Hex Dumbbell"
+                          className="w-full h-20 object-contain"
+                          loading="lazy"
+                        />
+                        <span className="text-[10px] font-black text-slate-800 mt-1">Gym Dumbbell</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* Carousel Indicators & Controls */}
-              <div className="absolute bottom-4 left-6 sm:left-10 flex items-center space-x-2 z-20">
-                {heroSlides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setHeroIndex(idx)}
-                    className={`h-2 rounded-full transition-all cursor-pointer ${
-                      heroIndex === idx ? 'w-8 bg-white' : 'w-2 bg-white/40 hover:bg-white/70'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <div className="absolute bottom-4 right-6 hidden sm:flex items-center space-x-2 z-20">
-                <button
-                  onClick={() => setHeroIndex((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white transition-colors cursor-pointer"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setHeroIndex((prev) => (prev + 1) % heroSlides.length)}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white transition-colors cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
               </div>
             </div>
           </section>
