@@ -289,6 +289,72 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
     return products.filter((p) => ['Footwear', 'Bags', 'Accessories', 'Sportswear & Accessories', 'Apparel'].includes(p.category) || ['Footwear', 'Bags', 'Accessories'].includes(normalizeCategory(p.category))).slice(0, 8);
   }, [products]);
 
+  const [bookSlideIndex, setBookSlideIndex] = useState(0);
+  const trendingScrollRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollTrending = (dir: 'left' | 'right') => {
+    if (trendingScrollRef.current) {
+      const scrollAmount = dir === 'left' ? -320 : 320;
+      trendingScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const handleLogoClick = () => {
+    setActiveTab('home');
+    setSelectedCategory('All Gear');
+    setSelectedSubtype('All');
+    setSearchQuery('');
+    setSelectedProduct(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const bookSlides = useMemo(() => [
+    {
+      id: 'football',
+      title: '⚽ FOOTBALL FAVORITES',
+      category: 'Football',
+      badge: 'MATCH READY GEAR',
+      desc: 'Match-ready footballs, stud shoes, goalkeeper gloves, and agility training gear.',
+      products: footballSectionProducts.slice(0, 6),
+      bgTint: 'bg-emerald-50/70 border-emerald-200/80',
+      badgeStyle: 'text-emerald-800 bg-emerald-100',
+      buttonStyle: 'bg-emerald-700 hover:bg-emerald-800 text-white',
+    },
+    {
+      id: 'badminton',
+      title: '🏸 BADMINTON ESSENTIALS',
+      category: 'Badminton',
+      badge: 'PRO PERFORMANCE',
+      desc: 'Tournament-grade rackets, nylon & feather shuttlecocks, court shoes, and kit bags.',
+      products: badmintonSectionProducts.slice(0, 6),
+      bgTint: 'bg-sky-50/70 border-sky-200/80',
+      badgeStyle: 'text-sky-800 bg-sky-100',
+      buttonStyle: 'bg-sky-700 hover:bg-sky-800 text-white',
+    },
+    {
+      id: 'fitness',
+      title: '🏋️ FITNESS & GYM GEAR',
+      category: 'Fitness & Gym',
+      badge: 'WORKOUT READY',
+      desc: 'Hex dumbbells, resistance bands, non-slip yoga mats, and gym accessories.',
+      products: fitnessSectionProducts.slice(0, 6),
+      bgTint: 'bg-indigo-50/70 border-indigo-200/80',
+      badgeStyle: 'text-indigo-800 bg-indigo-100',
+      buttonStyle: 'bg-indigo-700 hover:bg-indigo-800 text-white',
+    },
+    {
+      id: 'sportswear',
+      title: '👟 SPORTSWEAR & ACCESSORIES',
+      category: 'Sportswear & Accessories',
+      badge: 'ATHLETIC WEAR & GEAR',
+      desc: 'Quick-dry training t-shirts, track pants, sports caps, cushioned socks, and duffel bags.',
+      products: sportswearSectionProducts.slice(0, 6),
+      bgTint: 'bg-purple-50/70 border-purple-200/80',
+      badgeStyle: 'text-purple-800 bg-purple-100',
+      buttonStyle: 'bg-purple-700 hover:bg-purple-800 text-white',
+    },
+  ], [footballSectionProducts, badmintonSectionProducts, fitnessSectionProducts, sportswearSectionProducts]);
+
   // Handle Category click
   const handleSelectCategory = (catName: string) => {
     setSelectedCategory(catName);
@@ -412,7 +478,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   const renderProductSectionGrid = (productList: Product[]) => (
     <ProductSectionGrid
       productList={productList}
-      onSelectProduct={setSelectedProduct}
+      onSelectProduct={(prod) => {
+        setSelectedProduct(prod);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }}
       onAddToCart={handleAddToCart}
       inventory={inventory}
       wishlist={wishlist}
@@ -429,12 +498,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
           <div className="hidden md:flex items-center justify-between gap-6">
             {/* Logo + Brand Name */}
             <div
-              onClick={() => {
-                setActiveTab('home');
-                setSelectedCategory('All Gear');
-                setSelectedSubtype('All');
-                setSearchQuery('');
-              }}
+              onClick={handleLogoClick}
               className="flex items-center space-x-3 cursor-pointer shrink-0"
             >
               <div className="w-10 h-10 rounded-xl bg-[#E31B23] flex items-center justify-center text-white font-black text-xl shadow-md">
@@ -563,12 +627,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
             {/* ROW 1: Logo & Brand + Cart & Account */}
             <div className="flex items-center justify-between">
               <div
-                onClick={() => {
-                  setActiveTab('home');
-                  setSelectedCategory('All Gear');
-                  setSelectedSubtype('All');
-                  setSearchQuery('');
-                }}
+                onClick={handleLogoClick}
                 className="flex items-center space-x-2 cursor-pointer"
               >
                 <div className="w-8 h-8 rounded-lg bg-[#E31B23] flex items-center justify-center text-white font-black text-lg shadow-xs">
@@ -900,13 +959,29 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   <h2 className="text-2xl font-black text-[#111827] tracking-tight">⚡ Trending Now</h2>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs text-slate-500 font-bold">Scroll right to explore &rarr;</span>
+                  <button
+                    onClick={() => scrollTrending('left')}
+                    className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-red-50 hover:text-[#E31B23] flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                    title="Scroll Left"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => scrollTrending('right')}
+                    className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-red-50 hover:text-[#E31B23] flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                    title="Scroll Right"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
 
-              <div className="flex space-x-4 overflow-x-auto pb-4 no-scrollbar">
+              <div
+                ref={trendingScrollRef}
+                className="flex space-x-4 overflow-x-auto pb-4 no-scrollbar scroll-smooth"
+              >
                 {trendingProducts.map((prod) => (
-                  <div key={prod.id} className="w-[180px] sm:w-[220px] shrink-0">
+                  <div key={prod.id} className="w-[220px] sm:w-[245px] shrink-0">
                     {renderProductCard(prod)}
                   </div>
                 ))}
@@ -916,22 +991,22 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
           {/* CRICKET ESSENTIALS SECTION */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-md p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-md p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               {/* Left Promo Box */}
-              <div className="lg:col-span-4 bg-gradient-to-br from-[#E31B23] to-[#800A0F] rounded-2xl p-6 text-white space-y-4 shadow-lg flex flex-col justify-between min-h-[280px]">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2.5 py-0.5 rounded-full border border-white/20">
+              <div className="lg:col-span-4 bg-gradient-to-br from-[#E31B23] to-[#800A0F] rounded-2xl p-6 sm:p-8 text-white space-y-6 shadow-lg flex flex-col justify-between h-full">
+                <div className="space-y-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full border border-white/20 inline-block">
                     SEASON SPECIAL
                   </span>
-                  <h3 className="text-2xl font-black leading-tight">🏏 CRICKET ESSENTIALS</h3>
-                  <p className="text-xs text-white/80 font-medium">
-                    Built for every innings. Grade 1 Willows, Leather balls & match-ready armor.
+                  <h3 className="text-2xl sm:text-3xl font-black leading-tight tracking-tight">🏏 CRICKET ESSENTIALS</h3>
+                  <p className="text-xs sm:text-sm text-white/90 font-medium leading-relaxed">
+                    Everything you need for training, match day, and team practice—from bats and balls to protective gear.
                   </p>
                 </div>
                 <div>
                   <button
                     onClick={() => handleSelectCategory('Cricket')}
-                    className="w-full py-2.5 rounded-xl bg-white text-[#111827] font-black text-xs hover:bg-slate-100 transition-colors shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full py-3.5 rounded-xl bg-white text-[#111827] font-black text-xs sm:text-sm hover:bg-slate-100 transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
                   >
                     <span>View All Cricket Gear</span>
                     <ArrowRight className="w-4 h-4 text-[#E31B23]" />
@@ -941,92 +1016,75 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
               {/* Right Product Grid */}
               <div className="lg:col-span-8">
-                {renderProductSectionGrid(cricketSectionProducts)}
+                {renderProductSectionGrid(cricketSectionProducts.slice(0, 6))}
               </div>
             </div>
           </section>
 
-          {/* FOOTBALL FAVORITES SECTION */}
+          {/* SPORTS CATALOGUE BOOK-STYLE SLIDER SECTION */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-emerald-50/50 rounded-3xl border border-emerald-200/80 p-6 sm:p-8 space-y-6">
-              <div className="flex items-end justify-between border-b border-emerald-200/80 pb-4">
+            <div className={`rounded-3xl border p-6 sm:p-8 space-y-6 transition-all duration-500 shadow-md ${bookSlides[bookSlideIndex].bgTint}`}>
+              {/* Top Header & Page Controls */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
                 <div>
-                  <span className="text-xs font-black text-emerald-700 uppercase tracking-widest block">MATCH READY</span>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">⚽ FOOTBALL FAVORITES</h2>
+                  <div className="flex items-center space-x-2 mb-1">
+                    <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full ${bookSlides[bookSlideIndex].badgeStyle}`}>
+                      {bookSlides[bookSlideIndex].badge}
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">
+                      Page {bookSlideIndex + 1} of {bookSlides.length}
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                    {bookSlides[bookSlideIndex].title}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
+                    {bookSlides[bookSlideIndex].desc}
+                  </p>
                 </div>
-                <button
-                  onClick={() => handleSelectCategory('Football')}
-                  className="text-xs font-bold text-emerald-800 hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <span>View All Football</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+
+                <div className="flex items-center space-x-3 shrink-0">
+                  <button
+                    onClick={() => setBookSlideIndex((prev) => (prev > 0 ? prev - 1 : bookSlides.length - 1))}
+                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                    title="Previous Catalogue Page"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  <div className="flex items-center space-x-1.5 px-2">
+                    {bookSlides.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setBookSlideIndex(i)}
+                        className={`h-2.5 rounded-full transition-all cursor-pointer ${
+                          bookSlideIndex === i ? 'bg-[#E31B23] w-7' : 'bg-slate-300 hover:bg-slate-400 w-2.5'
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setBookSlideIndex((prev) => (prev < bookSlides.length - 1 ? prev + 1 : 0))}
+                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                    title="Next Catalogue Page"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+
+                  <button
+                    onClick={() => handleSelectCategory(bookSlides[bookSlideIndex].category)}
+                    className={`px-4 py-2.5 rounded-xl font-black text-xs transition-all shadow-xs cursor-pointer ${bookSlides[bookSlideIndex].buttonStyle}`}
+                  >
+                    View All {bookSlides[bookSlideIndex].category} &rarr;
+                  </button>
+                </div>
               </div>
 
-              {renderProductSectionGrid(footballSectionProducts)}
-            </div>
-          </section>
-
-          {/* BADMINTON ESSENTIALS SECTION */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-sky-50/50 rounded-3xl border border-sky-200/80 p-6 sm:p-8 space-y-6">
-              <div className="flex items-end justify-between border-b border-sky-200/80 pb-4">
-                <div>
-                  <span className="text-xs font-black text-sky-700 uppercase tracking-widest block">PRO PERFORMANCE</span>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">🏸 BADMINTON ESSENTIALS</h2>
-                </div>
-                <button
-                  onClick={() => handleSelectCategory('Badminton')}
-                  className="text-xs font-bold text-sky-800 hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <span>View All Badminton</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+              {/* Slide Content Grid */}
+              <div className="animate-in fade-in duration-300">
+                {renderProductSectionGrid(bookSlides[bookSlideIndex].products)}
               </div>
-
-              {renderProductSectionGrid(badmintonSectionProducts)}
-            </div>
-          </section>
-
-          {/* FITNESS & GYM GEAR SECTION */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-indigo-50/50 rounded-3xl border border-indigo-200/80 p-6 sm:p-8 space-y-6">
-              <div className="flex items-end justify-between border-b border-indigo-200/80 pb-4">
-                <div>
-                  <span className="text-xs font-black text-indigo-700 uppercase tracking-widest block">WORKOUT READY</span>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">🏋️ FITNESS & GYM GEAR</h2>
-                </div>
-                <button
-                  onClick={() => handleSelectCategory('Fitness & Gym')}
-                  className="text-xs font-bold text-indigo-800 hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <span>View All Fitness</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              {renderProductSectionGrid(fitnessSectionProducts)}
-            </div>
-          </section>
-
-          {/* SPORTSWEAR & ACCESSORIES SECTION */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-purple-50/50 rounded-3xl border border-purple-200/80 p-6 sm:p-8 space-y-6">
-              <div className="flex items-end justify-between border-b border-purple-200/80 pb-4">
-                <div>
-                  <span className="text-xs font-black text-purple-700 uppercase tracking-widest block">ATHLETIC WEAR & GEAR</span>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">👟 SPORTSWEAR & ACCESSORIES</h2>
-                </div>
-                <button
-                  onClick={() => handleSelectCategory('Sportswear & Accessories')}
-                  className="text-xs font-bold text-purple-800 hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <span>View All Sportswear</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              {renderProductSectionGrid(sportswearSectionProducts)}
             </div>
           </section>
 
@@ -1173,57 +1231,102 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
             {/* Desktop Left Sidebar Filters */}
-            <aside className="hidden md:block md:col-span-3 space-y-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs h-fit sticky top-24">
+            <aside className="hidden md:block md:col-span-3 space-y-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs h-fit sticky top-24">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <span className="font-black text-sm text-slate-900 flex items-center gap-1.5">
+                <span className="font-black text-sm text-slate-900 flex items-center gap-2">
                   <Filter className="w-4 h-4 text-[#E31B23]" />
-                  Filter Gear
+                  Shop by Sport
                 </span>
                 <button
                   onClick={() => {
+                    setSelectedCategory('All Gear');
+                    setSelectedSubtype('All');
                     setSelectedBrands([]);
                     setPriceRange({ min: '', max: '' });
                     setInStockOnly(false);
-                    setSelectedSubtype('All');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className="text-[11px] text-[#E31B23] font-bold hover:underline cursor-pointer"
                 >
-                  Reset
+                  Reset All
                 </button>
               </div>
 
-              {/* Subtype Chips */}
-              <div className="space-y-2">
-                <label className="font-bold text-xs text-slate-800 block">Subcategory / Variant</label>
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    onClick={() => setSelectedSubtype('All')}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                      selectedSubtype === 'All'
-                        ? 'bg-[#E31B23] text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    All Types
-                  </button>
-                  {getTypesForCategory(selectedCategory).map((st) => (
-                    <button
-                      key={st}
-                      onClick={() => setSelectedSubtype(st)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                        selectedSubtype === st
-                          ? 'bg-[#E31B23] text-white shadow-2xs'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                      }`}
-                    >
-                      {st}
-                    </button>
-                  ))}
-                </div>
+              {/* Main Categories Navigation List */}
+              <div className="space-y-1">
+                {[
+                  'All Gear',
+                  'Cricket',
+                  'Football',
+                  'Badminton',
+                  'Table Tennis',
+                  'Fitness & Gym',
+                  'Sportswear & Accessories',
+                ].map((catName) => {
+                  const isSelected = selectedCategory === catName;
+                  const subTypes = catName !== 'All Gear' ? getTypesForCategory(catName) : [];
+
+                  return (
+                    <div key={catName} className="space-y-1">
+                      <button
+                        onClick={() => {
+                          setSelectedCategory(catName);
+                          setSelectedSubtype('All');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className={`w-full text-left px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-between transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#E31B23] text-white shadow-xs'
+                            : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                        }`}
+                      >
+                        <span>{catName}</span>
+                        {subTypes.length > 0 && (
+                          <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'rotate-90 text-white' : 'text-slate-400'}`} />
+                        )}
+                      </button>
+
+                      {/* Expandable Subcategories Accordion - ONLY rendered when selected */}
+                      {isSelected && subTypes.length > 0 && (
+                        <div className="pl-3 pr-1 py-1 space-y-1 border-l-2 border-red-200 ml-3 animate-in fade-in duration-150">
+                          <button
+                            onClick={() => {
+                              setSelectedSubtype('All');
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className={`w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
+                              selectedSubtype === 'All'
+                                ? 'bg-red-50 text-[#E31B23]'
+                                : 'text-slate-600 hover:bg-slate-50'
+                            }`}
+                          >
+                            All {catName} Items
+                          </button>
+                          {subTypes.map((st) => (
+                            <button
+                              key={st}
+                              onClick={() => {
+                                setSelectedSubtype(st);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all truncate block ${
+                                selectedSubtype === st
+                                  ? 'bg-red-50 text-[#E31B23]'
+                                  : 'text-slate-600 hover:bg-slate-50'
+                              }`}
+                            >
+                              {st}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* In Stock Only */}
-              <div className="pt-2 border-t border-slate-100">
+              <div className="pt-3 border-t border-slate-100">
                 <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 cursor-pointer">
                   <input
                     type="checkbox"

@@ -38,6 +38,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [activeTab, setActiveTab] = useState<'desc' | 'specs' | 'shipping'>('desc');
   const [copiedLink, setCopiedLink] = useState(false);
 
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [product.id]);
+
   const inv = inventory[product.id];
   const availableStock = inv ? Math.max(0, inv.onHand - inv.reserved) : 0;
   const isOutOfStock = availableStock <= 0;
