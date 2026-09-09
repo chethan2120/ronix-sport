@@ -22,6 +22,16 @@ import {
   Flame,
   Heart,
   Eye,
+  ShieldCheck,
+  Headphones,
+  Lock,
+  Award,
+  Users,
+  Trophy,
+  Truck,
+  Dumbbell,
+  Target,
+  Shield,
 } from 'lucide-react';
 import { useStore, normalizeCategory } from '../../context/StoreContext';
 import { useAuth } from '../../context/AuthContext';
@@ -260,19 +270,23 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   }, [products]);
 
   const cricketSectionProducts = useMemo(() => {
-    return products.filter((p) => ['Cricket', 'Bats', 'Balls', 'Helmets', 'Gloves', 'Pads'].includes(p.category) || ['Cricket', 'Bats', 'Balls', 'Helmets', 'Gloves', 'Pads'].includes(normalizeCategory(p.category))).slice(0, 6);
+    return products.filter((p) => ['Cricket', 'Bats', 'Balls', 'Helmets', 'Gloves', 'Pads'].includes(p.category) || ['Cricket', 'Bats', 'Balls', 'Helmets', 'Gloves', 'Pads'].includes(normalizeCategory(p.category))).slice(0, 8);
   }, [products]);
 
   const footballSectionProducts = useMemo(() => {
-    return products.filter((p) => p.category === 'Football' || normalizeCategory(p.category) === 'Football').slice(0, 6);
+    return products.filter((p) => p.category === 'Football' || normalizeCategory(p.category) === 'Football').slice(0, 8);
   }, [products]);
 
   const badmintonSectionProducts = useMemo(() => {
-    return products.filter((p) => p.category === 'Badminton' || normalizeCategory(p.category) === 'Badminton').slice(0, 6);
+    return products.filter((p) => p.category === 'Badminton' || normalizeCategory(p.category) === 'Badminton').slice(0, 8);
   }, [products]);
 
   const fitnessSectionProducts = useMemo(() => {
-    return products.filter((p) => p.category === 'Fitness' || p.category === 'Fitness & Gym' || normalizeCategory(p.category) === 'Fitness').slice(0, 6);
+    return products.filter((p) => p.category === 'Fitness' || p.category === 'Fitness & Gym' || normalizeCategory(p.category) === 'Fitness').slice(0, 8);
+  }, [products]);
+
+  const sportswearSectionProducts = useMemo(() => {
+    return products.filter((p) => ['Footwear', 'Bags', 'Accessories', 'Sportswear & Accessories', 'Apparel'].includes(p.category) || ['Footwear', 'Bags', 'Accessories'].includes(normalizeCategory(p.category))).slice(0, 8);
   }, [products]);
 
   // Handle Category click
@@ -950,6 +964,175 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               </div>
 
               {renderProductSectionGrid(footballSectionProducts)}
+            </div>
+          </section>
+
+          {/* BADMINTON ESSENTIALS SECTION */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-sky-50/50 rounded-3xl border border-sky-200/80 p-6 sm:p-8 space-y-6">
+              <div className="flex items-end justify-between border-b border-sky-200/80 pb-4">
+                <div>
+                  <span className="text-xs font-black text-sky-700 uppercase tracking-widest block">PRO PERFORMANCE</span>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">🏸 BADMINTON ESSENTIALS</h2>
+                </div>
+                <button
+                  onClick={() => handleSelectCategory('Badminton')}
+                  className="text-xs font-bold text-sky-800 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <span>View All Badminton</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {renderProductSectionGrid(badmintonSectionProducts)}
+            </div>
+          </section>
+
+          {/* FITNESS & GYM GEAR SECTION */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-indigo-50/50 rounded-3xl border border-indigo-200/80 p-6 sm:p-8 space-y-6">
+              <div className="flex items-end justify-between border-b border-indigo-200/80 pb-4">
+                <div>
+                  <span className="text-xs font-black text-indigo-700 uppercase tracking-widest block">WORKOUT READY</span>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">🏋️ FITNESS & GYM GEAR</h2>
+                </div>
+                <button
+                  onClick={() => handleSelectCategory('Fitness & Gym')}
+                  className="text-xs font-bold text-indigo-800 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <span>View All Fitness</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {renderProductSectionGrid(fitnessSectionProducts)}
+            </div>
+          </section>
+
+          {/* SPORTSWEAR & ACCESSORIES SECTION */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-purple-50/50 rounded-3xl border border-purple-200/80 p-6 sm:p-8 space-y-6">
+              <div className="flex items-end justify-between border-b border-purple-200/80 pb-4">
+                <div>
+                  <span className="text-xs font-black text-purple-700 uppercase tracking-widest block">ATHLETIC WEAR & GEAR</span>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">👟 SPORTSWEAR & ACCESSORIES</h2>
+                </div>
+                <button
+                  onClick={() => handleSelectCategory('Sportswear & Accessories')}
+                  className="text-xs font-bold text-purple-800 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <span>View All Sportswear</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {renderProductSectionGrid(sportswearSectionProducts)}
+            </div>
+          </section>
+
+          {/* SHOP BY NEED SECTION */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            <div className="text-center max-w-2xl mx-auto space-y-1">
+              <span className="text-xs font-black text-[#E31B23] uppercase tracking-widest">CURATED COLLECTIONS</span>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">🎯 SHOP BY NEED</h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium">Find precisely what you need for tournament matches, daily drills, or team supplies.</p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {[
+                { title: 'Match Day Gear', category: 'Cricket', desc: 'Tournament grade equipment', icon: Trophy, color: 'from-red-500 to-rose-700' },
+                { title: 'Training Essentials', category: 'Football', desc: 'Cones, pumps & agility gear', icon: Zap, color: 'from-emerald-600 to-teal-800' },
+                { title: 'Team & Academy Supplies', category: 'All Gear', desc: 'Bulk sets & club bundles', icon: Users, color: 'from-blue-600 to-indigo-800' },
+                { title: 'Home Fitness', category: 'Fitness & Gym', desc: 'Weights, mats & bands', icon: Dumbbell, color: 'from-amber-500 to-orange-700' },
+                { title: 'Beginner Kits', category: 'Badminton', desc: 'Complete starter sets', icon: Award, color: 'from-purple-600 to-violet-800' },
+              ].map((need, idx) => {
+                const IconComp = need.icon;
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => handleSelectCategory(need.category)}
+                    className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-red-300 hover:shadow-lg transition-all duration-300 group cursor-pointer flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${need.color} text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                        <IconComp className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black text-slate-900 group-hover:text-[#E31B23] transition-colors leading-tight">
+                          {need.title}
+                        </h3>
+                        <p className="text-[11px] text-slate-500 font-medium mt-1 leading-snug">
+                          {need.desc}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center text-[11px] font-bold text-[#E31B23] pt-3 group-hover:translate-x-1 transition-transform">
+                      <span>Explore</span>
+                      <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* WHY SHOP WITH RONIX SPORTS SECTION */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-10 shadow-sm space-y-6">
+              <div className="text-center max-w-xl mx-auto space-y-1">
+                <span className="text-xs font-black text-[#E31B23] uppercase tracking-widest">THE RONIX DIFFERENCE</span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">🏆 WHY SHOP WITH RONIX SPORTS</h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
+                <div className="p-5 rounded-2xl bg-[#F8F9FA] border border-slate-100 space-y-3 text-center sm:text-left hover:border-red-200 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-red-100 text-[#E31B23] flex items-center justify-center mx-auto sm:mx-0 shadow-xs">
+                    <ShieldCheck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm text-slate-900">Quality Sports Equipment</h4>
+                    <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                      100% genuine products sourced directly from official manufacturers and competition grade batches.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-[#F8F9FA] border border-slate-100 space-y-3 text-center sm:text-left hover:border-red-200 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-red-100 text-[#E31B23] flex items-center justify-center mx-auto sm:mx-0 shadow-xs">
+                    <Award className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm text-slate-900">B2B Bulk Pricing</h4>
+                    <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                      Exclusive wholesale tiers for sports academies, schools, colleges, and registered sporting clubs.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-[#F8F9FA] border border-slate-100 space-y-3 text-center sm:text-left hover:border-red-200 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-red-100 text-[#E31B23] flex items-center justify-center mx-auto sm:mx-0 shadow-xs">
+                    <Lock className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm text-slate-900">Secure Ordering</h4>
+                    <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                      Encrypted payments with instant GST compliant invoice generation and verified transaction security.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-[#F8F9FA] border border-slate-100 space-y-3 text-center sm:text-left hover:border-red-200 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-red-100 text-[#E31B23] flex items-center justify-center mx-auto sm:mx-0 shadow-xs">
+                    <Truck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm text-slate-900">Fast Support & Delivery</h4>
+                    <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                      Express dispatch from central warehouses within 24 hours with dedicated phone and email support.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </main>
