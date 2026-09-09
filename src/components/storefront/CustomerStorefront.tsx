@@ -88,7 +88,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
       subtext: 'English Willow Bats • Match Leather Balls • Protective Gear',
       cta: 'Shop Cricket',
       category: 'Cricket',
-      image: 'https://images.unsplash.com/photo-1629218079858-6a75f8502f69?w=800&auto=format&fit=crop&q=80',
+      image: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&auto=format&fit=crop&q=80',
       bg: 'bg-gradient-to-r from-[#1E293B] via-[#7F1D1D] to-[#E31B23]',
     },
     {
@@ -1194,6 +1194,173 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
           </div>
         </div>
       )}
+
+      {/* COMPLETE RONIX SPORTS FOOTER */}
+      <footer className="bg-[#0B0F17] text-slate-300 border-t border-slate-800 pt-12 pb-8 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            {/* Col 1: Brand Info & Contact */}
+            <div className="space-y-4">
+              <div
+                onClick={() => {
+                  setActiveTab('home');
+                  setSelectedCategory('All Gear');
+                  setSelectedSubtype('All');
+                  setSearchQuery('');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="flex items-center space-x-3 cursor-pointer"
+              >
+                <div className="w-9 h-9 rounded-xl bg-[#E31B23] flex items-center justify-center text-white font-black text-xl shadow-md">
+                  R
+                </div>
+                <div>
+                  <span className="text-lg font-black tracking-tight text-white block leading-none">
+                    RONIX <span className="text-[#E31B23]">SPORTS</span>
+                  </span>
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mt-0.5">
+                    SPORTS & FITNESS STORE
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                Quality sports equipment, fitness gear and accessories for players, teams and everyday athletes.
+              </p>
+
+              <div className="space-y-1.5 text-xs text-slate-300 font-medium">
+                <p className="flex items-center gap-2">
+                  <span className="text-[#E31B23] font-bold">Phone:</span>
+                  <span>+91 98765 43210</span>
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="text-[#E31B23] font-bold">Email:</span>
+                  <span>support@ronixsports.com</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Col 2: Shop Shortcuts */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-black text-white uppercase tracking-wider border-b border-slate-800 pb-2">
+                Shop Shortcuts
+              </h4>
+              <ul className="space-y-2 text-xs font-semibold text-slate-400">
+                {[
+                  'Cricket',
+                  'Football',
+                  'Badminton',
+                  'Table Tennis',
+                  'Volleyball',
+                  'Basketball',
+                  'Fitness & Gym',
+                  'Sportswear & Accessories',
+                ].map((cat) => (
+                  <li key={cat}>
+                    <button
+                      onClick={() => handleSelectCategory(cat)}
+                      className="hover:text-[#E31B23] transition-colors cursor-pointer text-left"
+                    >
+                      {cat}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Col 3: Quick Links */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-black text-white uppercase tracking-wider border-b border-slate-800 pb-2">
+                Quick Links
+              </h4>
+              <ul className="space-y-2 text-xs font-semibold text-slate-400">
+                <li>
+                  <button
+                    onClick={() => {
+                      setActiveTab('home');
+                      setSelectedCategory('All Gear');
+                      setSelectedSubtype('All');
+                      setSearchQuery('');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="hover:text-[#E31B23] transition-colors cursor-pointer"
+                  >
+                    Home
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleSelectCategory('All Gear')}
+                    className="hover:text-[#E31B23] transition-colors cursor-pointer"
+                  >
+                    Shop All
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      setActiveTab('my-orders');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="hover:text-[#E31B23] transition-colors cursor-pointer"
+                  >
+                    My Orders
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => setIsCartOpen(true)}
+                    className="hover:text-[#E31B23] transition-colors cursor-pointer"
+                  >
+                    Cart ({totalCartCount})
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      setActiveTab('account');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="hover:text-[#E31B23] transition-colors cursor-pointer"
+                  >
+                    Account
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 4: Customer Service */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-black text-white uppercase tracking-wider border-b border-slate-800 pb-2">
+                Customer Service
+              </h4>
+              <ul className="space-y-2 text-xs font-semibold text-slate-400">
+                <li>Order Tracking</li>
+                <li>Shipping Information</li>
+                <li>Returns & Replacement</li>
+                <li>Warranty & Guarantee</li>
+                <li>Contact & Support</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 font-medium gap-3">
+            <p>© 2026 Ronix Sports. All rights reserved.</p>
+            <p>
+              Designed and Maintained by{' '}
+              <a
+                href="https://webnxt.co/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-[#E31B23] font-bold transition-colors underline"
+              >
+                WebNxt
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
 
       {/* MOBILE BOTTOM NAVIGATION BAR */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-lg flex justify-around items-center py-2 px-2">
