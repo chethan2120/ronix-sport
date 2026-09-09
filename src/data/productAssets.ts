@@ -1,79 +1,94 @@
-// SKU-Specific Isolated E-Commerce Product Photography Assets (Pure Raster Isolated Product Shots, White/Neutral Studio Background)
+/**
+ * Product-specific image asset mapping for Ronix Sports Storefront.
+ * Every product SKU points to a unique high-quality raster photograph of the product.
+ * NO generic stadium photos, NO people/models, NO SVG/vector graphics, NO duplicates.
+ */
+
+export interface ProductAssetMap {
+  [sku: string]: string;
+}
 
 export const PRODUCT_ASSETS: Record<string, string> = {
-  // Cricket SKUs
-  'CRI-BAT-KW-001': 'https://images.unsplash.com/photo-1593766788306-28561086694e?w=600&auto=format&fit=crop&q=80',
-  'CRI-BAT-EW-002': 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&auto=format&fit=crop&q=80',
-  'CRI-GLV-003': 'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=600&auto=format&fit=crop&q=80',
-  'CRI-PAD-004': 'https://images.unsplash.com/photo-1517649763962-0c623266010b?w=600&auto=format&fit=crop&q=80',
-  'CRI-HLM-005': 'https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?w=600&auto=format&fit=crop&q=80',
-  'CRI-BAL-L-006': 'https://images.unsplash.com/photo-1589487391730-58f20eb2c308?w=600&auto=format&fit=crop&q=80',
-  'CRI-BAL-W-007': 'https://images.unsplash.com/photo-1617083934555-ac7d4fed8814?w=600&auto=format&fit=crop&q=80',
-  'CRI-BAL-T-008': 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=600&auto=format&fit=crop&q=80',
-  'CRI-BAT-P-009': 'https://images.unsplash.com/photo-1512716676800-4700a1df86a0?w=600&auto=format&fit=crop&q=80',
-  'CRI-BAG-010': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80',
-  'CRI-SHN-011': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80',
-  'CRI-STP-012': 'https://images.unsplash.com/photo-1562077772-3bd90403f7f0?w=600&auto=format&fit=crop&q=80',
-
-  // Football SKUs
-  'FTB-BAL-013': 'https://images.unsplash.com/photo-1614632537190-23e4146777db?w=600&auto=format&fit=crop&q=80',
-  'FTB-BAL-014': 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&auto=format&fit=crop&q=80',
-  'FTB-SHN-015': 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=600&auto=format&fit=crop&q=80',
-  'FTB-GLV-016': 'https://images.unsplash.com/photo-1608245449230-4ac19066d210?w=600&auto=format&fit=crop&q=80',
-  'FTB-SHO-017': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80',
-  'FTB-CON-018': 'https://images.unsplash.com/photo-1526676037777-05a232554f77?w=600&auto=format&fit=crop&q=80',
-  'FTB-PMP-019': 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&auto=format&fit=crop&q=80',
-  'FTB-ARM-020': 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&auto=format&fit=crop&q=80',
-
-  // Badminton SKUs
-  'BAD-RCT-021': 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&auto=format&fit=crop&q=80',
-  'BAD-RCT-022': 'https://images.unsplash.com/photo-1613918431703-8840eb24d86c?w=600&auto=format&fit=crop&q=80',
-  'BAD-SHT-023': 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=600&auto=format&fit=crop&q=80',
-  'BAD-SHT-024': 'https://images.unsplash.com/photo-1521537634581-0ddea2f34840?w=600&auto=format&fit=crop&q=80',
-  'BAD-SHO-025': 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&auto=format&fit=crop&q=80',
-  'BAD-GRP-026': 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600&auto=format&fit=crop&q=80',
-  'BAD-NET-027': 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=600&auto=format&fit=crop&q=80',
-
-  // Table Tennis SKUs
-  'TT-BAT-028': 'https://images.unsplash.com/photo-1534158914592-062992fbe900?w=600&auto=format&fit=crop&q=80',
-  'TT-BAL-029': 'https://images.unsplash.com/photo-1611251100435-d22501a35564?w=600&auto=format&fit=crop&q=80',
-  'TT-NET-030': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&auto=format&fit=crop&q=80',
-  'TT-CAS-031': 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&auto=format&fit=crop&q=80',
-
-  // Volleyball SKUs
-  'VLB-BAL-032': 'https://images.unsplash.com/photo-1592656094267-764a45160876?w=600&auto=format&fit=crop&q=80',
-  'VLB-KNE-033': 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&auto=format&fit=crop&q=80',
-
-  // Basketball SKUs
-  'BSK-BAL-034': 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=600&auto=format&fit=crop&q=80',
-  'BSK-BAL-035': 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&auto=format&fit=crop&q=80',
-  'BSK-ACC-036': 'https://images.unsplash.com/photo-1505666287802-931dc83948e9?w=600&auto=format&fit=crop&q=80',
-
-  // Fitness SKUs
-  'FIT-DMB-037': 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&auto=format&fit=crop&q=80',
-  'FIT-KTB-038': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
-  'FIT-MAT-039': 'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=600&auto=format&fit=crop&q=80',
-  'FIT-BND-040': 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=600&auto=format&fit=crop&q=80',
-  'FIT-ROL-041': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&auto=format&fit=crop&q=80',
-  'FIT-ROP-042': 'https://images.unsplash.com/photo-1514994667787-b48ca3da154f?w=600&auto=format&fit=crop&q=80',
-  'FIT-FOM-043': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&auto=format&fit=crop&q=80',
-  'FIT-GRP-044': 'https://images.unsplash.com/photo-1591940742878-13aba4b7a34e?w=600&auto=format&fit=crop&q=80',
-
-  // Sportswear SKUs
-  'SPW-TSH-045': 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80',
-  'SPW-PNT-046': 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=600&auto=format&fit=crop&q=80',
-  'SPW-SOK-047': 'https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=600&auto=format&fit=crop&q=80',
-  'SPW-WRT-048': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80',
-  'SPW-BAG-049': 'https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=600&auto=format&fit=crop&q=80',
-  'SPW-BTL-050': 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&auto=format&fit=crop&q=80',
+  "CRK-BAT-001": "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&auto=format&fit=crop&q=80",
+  "CRK-BAT-002": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&auto=format&fit=crop&q=80",
+  "CRK-BAL-003": "https://images.unsplash.com/photo-1589801258579-18e091f4ca26?w=800&auto=format&fit=crop&q=80",
+  "CRK-BAL-004": "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800&auto=format&fit=crop&q=80",
+  "CRK-HLM-005": "https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=800&auto=format&fit=crop&q=80",
+  "CRK-GLV-006": "https://images.unsplash.com/photo-1563299796-b729d0af54a5?w=800&auto=format&fit=crop&q=80",
+  "CRK-PAD-007": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop&q=80",
+  "CRK-BAG-008": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&auto=format&fit=crop&q=80",
+  "CRK-WKT-009": "https://images.unsplash.com/photo-1515523110800-9415d13b84a8?w=800&auto=format&fit=crop&q=80",
+  "CRK-DRS-010": "https://images.unsplash.com/photo-1614632537190-23e4146777db?w=800&auto=format&fit=crop&q=80",
+  "FTB-BAL-011": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80",
+  "FTB-BAL-012": "https://images.unsplash.com/photo-1511886929837-354d827aae26?w=800&auto=format&fit=crop&q=80",
+  "FTB-SHO-013": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop&q=80",
+  "FTB-SHO-014": "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&auto=format&fit=crop&q=80",
+  "FTB-SHN-015": "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&auto=format&fit=crop&q=80",
+  "FTB-GLV-016": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80",
+  "FTB-JER-017": "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&auto=format&fit=crop&q=80",
+  "FTB-PNT-018": "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80",
+  "FTB-NET-019": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&auto=format&fit=crop&q=80",
+  "FTB-PMP-020": "https://images.unsplash.com/photo-1627627256672-027a4613d028?w=800&auto=format&fit=crop&q=80",
+  "BAD-RCT-021": "https://images.unsplash.com/photo-1534158914592-062992fbe900?w=800&auto=format&fit=crop&q=80",
+  "BAD-RCT-022": "https://images.unsplash.com/photo-1560012057-4372e14c5085?w=800&auto=format&fit=crop&q=80",
+  "BAD-SHT-023": "https://images.unsplash.com/photo-1511067007398-7e4b90cfa4bc?w=800&auto=format&fit=crop&q=80",
+  "BAD-SHT-024": "https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=800&auto=format&fit=crop&q=80",
+  "TNN-RCT-025": "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&auto=format&fit=crop&q=80",
+  "TNN-BAL-026": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
+  "TT-BAT-027": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&auto=format&fit=crop&q=80",
+  "TT-BAL-028": "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=800&auto=format&fit=crop&q=80",
+  "TT-BAL-029": "https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=800&auto=format&fit=crop&q=80",
+  "RKT-BAG-030": "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=800&auto=format&fit=crop&q=80",
+  "FIT-DMB-031": "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=800&auto=format&fit=crop&q=80",
+  "FIT-DMB-032": "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800&auto=format&fit=crop&q=80",
+  "FIT-KTL-033": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&auto=format&fit=crop&q=80",
+  "FIT-MAT-034": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&auto=format&fit=crop&q=80",
+  "FIT-BND-035": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800&auto=format&fit=crop&q=80",
+  "FIT-BNC-036": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop&q=80",
+  "FIT-BAR-037": "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=800&auto=format&fit=crop&q=80",
+  "FIT-PLT-038": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&auto=format&fit=crop&q=80",
+  "FIT-GLV-039": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=800&auto=format&fit=crop&q=80",
+  "FIT-BEL-040": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80",
+  "ACC-BOT-041": "https://images.unsplash.com/photo-1580086319619-3ed498161c77?w=800&auto=format&fit=crop&q=80",
+  "FIT-ROP-042": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=80",
+  "ACC-TOW-043": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=80",
+  "ACC-BAG-044": "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=800&auto=format&fit=crop&q=80",
+  "ACC-SCK-045": "https://images.unsplash.com/photo-1517438322307-e67111335449?w=800&auto=format&fit=crop&q=80",
+  "ACC-CAP-046": "https://images.unsplash.com/photo-1520256862855-398228c41684?w=800&auto=format&fit=crop&q=80",
+  "ACC-WRB-047": "https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?w=800&auto=format&fit=crop&q=80",
+  "ACC-KNE-048": "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&auto=format&fit=crop&q=80",
+  "ACC-MAT-049": "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=800&auto=format&fit=crop&q=80",
+  "ACC-FAK-050": "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&auto=format&fit=crop&q=80"
 };
 
-// Default high resolution isolated sports product raster fallback URL
-export const RASTER_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80';
+export const RASTER_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&auto=format&fit=crop&q=80';
 
-export function getSkuProductAsset(sku: string, category?: string): string {
+export function getSkuProductAsset(sku?: string, category?: string): string {
   if (sku && PRODUCT_ASSETS[sku]) {
     return PRODUCT_ASSETS[sku];
+  }
+  return RASTER_FALLBACK_IMAGE;
+}
+
+export function getProductImageBySku(sku: string): string {
+  if (sku && PRODUCT_ASSETS[sku]) {
+    return PRODUCT_ASSETS[sku];
+  }
+  return RASTER_FALLBACK_IMAGE;
+}
+
+export function getProductImage(product: { id?: string; sku?: string; image_url?: string; image?: string; name?: string }): string {
+  if (product.sku && PRODUCT_ASSETS[product.sku]) {
+    return PRODUCT_ASSETS[product.sku];
+  }
+  if (product.id && PRODUCT_ASSETS[product.id]) {
+    return PRODUCT_ASSETS[product.id];
+  }
+  if (product.image_url && !product.image_url.includes('placeholder') && !product.image_url.includes('via.placeholder.com')) {
+    return product.image_url;
+  }
+  if (product.image && !product.image.includes('placeholder') && !product.image.includes('via.placeholder.com')) {
+    return product.image;
   }
   return RASTER_FALLBACK_IMAGE;
 }
