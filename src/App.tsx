@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/StoreContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { ProtectedRoute, getFirstAllowedRouteForUser } from './components/auth/ProtectedRoute';
 import { LoginPage } from './components/auth/LoginPage';
 import { SignupPage } from './components/auth/SignupPage';
 import { Sidebar } from './components/Sidebar';
@@ -36,7 +36,7 @@ import {
 
 // Root Redirect component based on logged-in role
 const RootRedirect: React.FC = () => {
-  const { profile, loading } = useAuth();
+  const { profile, loading, hasPermission } = useAuth();
 
   if (loading) {
     return (
@@ -55,31 +55,30 @@ const RootRedirect: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (profile.role === 'admin') {
-    return <Navigate to="/dashboard" replace />;
-  }
-  if (profile.role === 'stock') {
-    return <Navigate to="/inventory" replace />;
-  }
-  if (profile.role === 'customer') {
-    return <Navigate to="/store" replace />;
-  }
-
-  return <Navigate to="/dashboard" replace />;
+  const targetRoute = getFirstAllowedRouteForUser(profile, hasPermission);
+  return <Navigate to={targetRoute} replace />;
 };
 
 // Route wrapper for Login/Signup: Redirect authenticated users to their home
 const PublicOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { profile, loading } = useAuth();
+  const { profile, loading, hasPermission } = useAuth();
 
   if (loading) {
-    return null;
+    return (
+      <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-[#E31B23] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">
+            Loading Ronix Sports CRM...
+          </span>
+        </div>
+      </div>
+    );
   }
 
   if (profile) {
-    if (profile.role === 'admin') return <Navigate to="/dashboard" replace />;
-    if (profile.role === 'stock') return <Navigate to="/inventory" replace />;
-    if (profile.role === 'customer') return <Navigate to="/store" replace />;
+    const targetRoute = getFirstAllowedRouteForUser(profile, hasPermission);
+    return <Navigate to={targetRoute} replace />;
   }
 
   return <>{children}</>;

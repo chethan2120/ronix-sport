@@ -121,7 +121,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const initAuth = async () => {
       try {
         if (isSupabaseConfigured) {
-          const { data: { session } } = await supabase.auth.getSession();
+          // Timeout guarantee of 2.5s to prevent hanging session calls
+          const sessionPromise = supabase.auth.getSession();
+          const timeoutPromise = new Promise<{ data: { session: null } }>((resolve) =>
+            setTimeout(() => resolve({ data: { session: null } }), 2500)
+          );
+
+          const res = await Promise.race([sessionPromise, timeoutPromise]);
+          const session = res?.data?.session;
+
           if (session?.user && mounted) {
             const sbUser: AuthUser = {
               id: session.user.id,
@@ -130,7 +138,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             };
             setUser(sbUser);
 
-            // Fetch profile from Supabase profiles table
             const { data: profData } = await supabase
               .from('profiles')
               .select('*')
@@ -149,75 +156,99 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 created_at: profData.created_at,
                 last_login: new Date().toISOString(),
               };
+
+              // Fetch permissions from Supabase user_permissions table
+              try {
+                const { data: permData } = await supabase
+                  .from('user_permissions')
+                  .select('module, can_access')
+                  .eq('user_id', session.user.id);
+
+                if (permData && Array.isArray(permData) && permData.length > 0) {
+                  const permObj: Record<string, boolean> = {};
+                  permData.forEach((p: any) => {
+                    if (p.module) permObj[p.module] = Boolean(p.can_access);
+                  });
+                  userProf.permissions = permObj;
+                }
+              } catch (e) {}
+
               setProfile(userProf);
             }
           }
         }
       } catch (err) {
         console.warn('Supabase auth session fetch warning:', err);
-      }
-
-      // Check local session storage if no Supabase session active
-      if (mounted) {
-        const localSession = localStorage.getItem(LOCAL_SESSION_KEY);
-        if (localSession) {
-          try {
-            const savedProfile: UserProfile = JSON.parse(localSession);
-            if (savedProfile && savedProfile.id) {
-              setProfile((curr) => curr || savedProfile);
-              setUser((curr) => curr || { id: savedProfile.id, email: savedProfile.email });
-            }
-          } catch (e) {}
+      } finally {
+        if (mounted) {
+          const localSession = localStorage.getItem(LOCAL_SESSION_KEY);
+          if (localSession) {
+            try {
+              const savedProfile: UserProfile = JSON.parse(localSession);
+              if (savedProfile && savedProfile.id) {
+                setProfile((curr) => curr || savedProfile);
+                setUser((curr) => curr || { id: savedProfile.id, email: savedProfile.email });
+              }
+            } catch (e) {}
+          }
+          setLoading(false);
         }
-        setLoading(false);
       }
     };
 
     initAuth();
 
-    // Listen to Supabase Auth State Changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        const sbUser: AuthUser = {
-          id: session.user.id,
-          email: session.user.email || '',
-          user_metadata: session.user.user_metadata as any,
-        };
-        setUser(sbUser);
-
-        try {
-          const { data: profData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-
-          if (profData) {
-            const matchedRole: AppRole = profData.role || 'customer';
-            const userProf: UserProfile = {
-              id: profData.id,
-              full_name: profData.full_name || sbUser.email,
-              email: profData.email || sbUser.email,
-              phone: profData.phone || '',
-              role: matchedRole,
-              status: profData.status || 'Active',
-              created_at: profData.created_at,
-              last_login: new Date().toISOString(),
+    // Listen to Supabase Auth State Changes if configured
+    let authListener: { subscription: { unsubscribe: () => void } } | null = null;
+    if (isSupabaseConfigured) {
+      try {
+        const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+          if (session?.user) {
+            const sbUser: AuthUser = {
+              id: session.user.id,
+              email: session.user.email || '',
+              user_metadata: session.user.user_metadata as any,
             };
-            setProfile(userProf);
-            localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(userProf));
+            setUser(sbUser);
+
+            try {
+              const { data: profData } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+              if (profData) {
+                const matchedRole: AppRole = profData.role || 'customer';
+                const userProf: UserProfile = {
+                  id: profData.id,
+                  full_name: profData.full_name || sbUser.email,
+                  email: profData.email || sbUser.email,
+                  phone: profData.phone || '',
+                  role: matchedRole,
+                  status: profData.status || 'Active',
+                  created_at: profData.created_at,
+                  last_login: new Date().toISOString(),
+                };
+                setProfile(userProf);
+                localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(userProf));
+              }
+            } catch (e) {}
+          } else if (event === 'SIGNED_OUT') {
+            setUser(null);
+            setProfile(null);
+            localStorage.removeItem(LOCAL_SESSION_KEY);
           }
-        } catch (e) {}
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setProfile(null);
-        localStorage.removeItem(LOCAL_SESSION_KEY);
-      }
-    });
+        });
+        authListener = data;
+      } catch (e) {}
+    }
 
     return () => {
       mounted = false;
-      authListener.subscription.unsubscribe();
+      if (authListener?.subscription) {
+        authListener.subscription.unsubscribe();
+      }
     };
   }, []);
 
