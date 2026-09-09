@@ -1,7 +1,7 @@
 /**
  * Product-specific image asset mapping for Ronix Sports Storefront.
- * Every product SKU points to a unique high-quality raster photograph of the product.
- * NO generic stadium photos, NO people/models, NO SVG/vector graphics, NO duplicates.
+ * Every product SKU points to a unique high-quality studio raster photograph of the product.
+ * STRICT: NO people, NO models, NO athletes, NO hands, NO stadiums, NO lifestyle shots.
  */
 
 export interface ProductAssetMap {
@@ -14,13 +14,13 @@ export const PRODUCT_ASSETS: Record<string, string> = {
   "CRI-GLV-003": "https://images.unsplash.com/photo-1563299796-b729d0af54a5?w=800&auto=format&fit=crop&q=80",
   "CRI-PAD-004": "https://images.unsplash.com/photo-1512716676801-e7fcd9384d53?w=800&auto=format&fit=crop&q=80",
   "CRI-HLM-005": "https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=800&auto=format&fit=crop&q=80",
-  "CRI-THG-006": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&auto=format&fit=crop&q=80",
+  "CRI-THG-006": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=800&auto=format&fit=crop&q=80",
   "CRI-ABD-007": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80",
-  "CRI-BAG-008": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop&q=80",
-  "CRI-BAL-TEN-009": "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800&auto=format&fit=crop&q=80",
+  "CRI-BAG-008": "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=800&auto=format&fit=crop&q=80",
+  "CRI-BAL-TEN-009": "https://images.unsplash.com/photo-1534158914592-062992fbe900?w=800&auto=format&fit=crop&q=80",
   "CRI-BAL-LTH-010": "https://images.unsplash.com/photo-1589801258579-18e091f4ca26?w=800&auto=format&fit=crop&q=80",
   "CRI-STP-011": "https://images.unsplash.com/photo-1515523110800-9415d13b84a8?w=800&auto=format&fit=crop&q=80",
-  "CRI-ARM-012": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=800&auto=format&fit=crop&q=80",
+  "CRI-ARM-012": "https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?w=800&auto=format&fit=crop&q=80",
   "FOO-BAL-001": "https://images.unsplash.com/photo-1614632537190-23e4146777db?w=800&auto=format&fit=crop&q=80",
   "FOO-SHO-002": "https://images.unsplash.com/photo-1511886929837-354d827aae26?w=800&auto=format&fit=crop&q=80",
   "FOO-SHN-003": "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&auto=format&fit=crop&q=80",
@@ -31,8 +31,8 @@ export const PRODUCT_ASSETS: Record<string, string> = {
   "FOO-FUT-008": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80",
   "BAD-RAC-YON-001": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&auto=format&fit=crop&q=80",
   "BAD-RAC-LIN-002": "https://images.unsplash.com/photo-1521537634581-0dced2efa2a3?w=800&auto=format&fit=crop&q=80",
-  "BAD-SHU-NYL-003": "https://images.unsplash.com/photo-1534158914592-062992fbe900?w=800&auto=format&fit=crop&q=80",
-  "BAD-SHU-FTH-004": "https://images.unsplash.com/photo-1627627256672-027a4613d028?w=800&auto=format&fit=crop&q=80",
+  "BAD-SHU-NYL-003": "https://images.unsplash.com/photo-1627627256672-027a4613d028?w=800&auto=format&fit=crop&q=80",
+  "BAD-SHU-FTH-004": "https://images.unsplash.com/photo-1534158914592-062992fbe900?w=800&auto=format&fit=crop&q=80",
   "BAD-NET-005": "https://images.unsplash.com/photo-1617083934555-ac7d4fed8814?w=800&auto=format&fit=crop&q=80",
   "BAD-GRP-006": "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=800&auto=format&fit=crop&q=80",
   "BAD-BAG-007": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
@@ -57,7 +57,7 @@ export const PRODUCT_ASSETS: Record<string, string> = {
   "SPT-BTL-002": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800&auto=format&fit=crop&q=80",
   "SPT-SCK-003": "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=800&auto=format&fit=crop&q=80",
   "SPT-SHO-004": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop&q=80",
-  "SPT-TSH-005": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&auto=format&fit=crop&q=80",
+  "SPT-TSH-005": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80",
   "SPT-PNT-006": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80",
   "CRK-BAT-001": "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&auto=format&fit=crop&q=80",
   "CRK-BAT-002": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&auto=format&fit=crop&q=80",
