@@ -395,37 +395,16 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   };
 
   // Render Product Section Grid dynamically based on item count
-  const renderProductSectionGrid = (productList: Product[]) => {
-    if (!productList || productList.length === 0) {
-      return <p className="text-xs text-slate-500 font-medium py-2">No products currently available.</p>;
-    }
-    if (productList.length === 1) {
-      return (
-        <div className="w-full max-w-xs">
-          {renderProductCard(productList[0])}
-        </div>
-      );
-    }
-    if (productList.length === 2) {
-      return (
-        <div className="grid grid-cols-2 max-w-xl gap-4 sm:gap-5">
-          {productList.map((prod) => renderProductCard(prod))}
-        </div>
-      );
-    }
-    if (productList.length === 3) {
-      return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 max-w-3xl gap-4 sm:gap-5">
-          {productList.map((prod) => renderProductCard(prod))}
-        </div>
-      );
-    }
-    return (
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
-        {productList.map((prod) => renderProductCard(prod))}
-      </div>
-    );
-  };
+  const renderProductSectionGrid = (productList: Product[]) => (
+    <ProductSectionGrid
+      productList={productList}
+      onSelectProduct={setSelectedProduct}
+      onAddToCart={handleAddToCart}
+      inventory={inventory}
+      wishlist={wishlist}
+      onToggleWishlist={toggleWishlist}
+    />
+  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-24 md:pb-12 overflow-x-hidden">
@@ -1461,3 +1440,138 @@ function HomeIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+interface ProductSectionGridProps {
+  productList: Product[];
+  onSelectProduct: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number, e?: React.MouseEvent) => void;
+  inventory: Record<string, any>;
+  wishlist: Record<string, boolean>;
+  onToggleWishlist: (productId: string, e: React.MouseEvent) => void;
+}
+
+export const ProductSectionGrid: React.FC<ProductSectionGridProps> = ({
+  productList,
+  onSelectProduct,
+  onAddToCart,
+  inventory,
+  wishlist,
+  onToggleWishlist,
+}) => {
+  if (!productList || productList.length === 0) {
+    return <p className="text-xs text-slate-500 font-medium py-2">No products currently available.</p>;
+  }
+
+  const renderCard = (prod: Product) => {
+    const inv = inventory[prod.id];
+    const available = inv ? Math.max(0, inv.onHand - inv.reserved) : 0;
+    const isOutOfStock = available <= 0;
+    const isLowStock = available > 0 && available <= 10;
+    const discInfo = getEffectiveProductPrice(prod);
+    const isWishlisted = Boolean(wishlist[prod.id]);
+
+    return (
+      <div
+        key={prod.id}
+        onClick={() => onSelectProduct(prod)}
+        className="group relative bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-xl hover:border-red-300 transition-all duration-300 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1"
+      >
+        <div className="relative aspect-square w-full bg-slate-50/60 p-3 sm:p-4 flex items-center justify-center border-b border-slate-100 overflow-hidden">
+          {discInfo.hasDiscount && (
+            <div className="absolute top-2 left-2 z-10">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#E31B23] text-white shadow-2xs">
+                {discInfo.discountLabel}
+              </span>
+            </div>
+          )}
+
+          <button
+            onClick={(e) => onToggleWishlist(prod.id, e)}
+            className="absolute top-2 right-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 backdrop-blur-xs border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#E31B23] hover:scale-110 transition-all shadow-xs"
+            title="Add to Wishlist"
+          >
+            <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isWishlisted ? 'fill-[#E31B23] text-[#E31B23]' : ''}`} />
+          </button>
+
+          <ProductImage
+            src={prod.image_url || prod.image}
+            alt={prod.name}
+            category={prod.category}
+            name={prod.name}
+            product={prod}
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+          />
+
+          <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <span className="bg-white/95 text-slate-900 font-extrabold text-[11px] px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
+              <Eye className="w-3.5 h-3.5 text-[#E31B23]" />
+              <span>Quick View</span>
+            </span>
+          </div>
+        </div>
+
+        <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-2">
+          <div>
+            <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 font-semibold mb-0.5">
+              <span>{prod.brand}</span>
+              <span className="text-[#E31B23] font-bold">{prod.category}</span>
+            </div>
+
+            <h3 className="text-xs sm:text-sm font-black text-slate-900 line-clamp-2 leading-snug group-hover:text-[#E31B23] transition-colors">
+              {prod.name}
+            </h3>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 space-y-2">
+            <div className="flex items-baseline justify-between">
+              <div className="flex items-baseline gap-1">
+                <span className="text-sm sm:text-base font-black text-slate-900">
+                  ₹{discInfo.finalPrice.toLocaleString('en-IN')}
+                </span>
+                {discInfo.hasDiscount && (
+                  <span className="text-[11px] text-slate-400 line-through font-medium">
+                    ₹{discInfo.originalPrice.toLocaleString('en-IN')}
+                  </span>
+                )}
+              </div>
+
+              <div>
+                {isOutOfStock ? (
+                  <span className="text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Out</span>
+                ) : isLowStock ? (
+                  <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Low</span>
+                ) : (
+                  <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">In Stock</span>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={(e) => onAddToCart(prod, 1, e)}
+              disabled={isOutOfStock}
+              className={`w-full py-1.5 sm:py-2 px-3 rounded-xl font-black text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                isOutOfStock
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-[#E31B23] hover:bg-[#B5121B] text-white shadow-xs hover:shadow-md'
+              }`}
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>{isOutOfStock ? 'Sold Out' : 'Add to Cart'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (productList.length === 1) {
+    return <div className="w-full max-w-xs">{renderCard(productList[0])}</div>;
+  }
+  if (productList.length === 2) {
+    return <div className="grid grid-cols-2 max-w-xl gap-4 sm:gap-5">{productList.map(renderCard)}</div>;
+  }
+  if (productList.length === 3) {
+    return <div className="grid grid-cols-2 sm:grid-cols-3 max-w-3xl gap-4 sm:gap-5">{productList.map(renderCard)}</div>;
+  }
+  return <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">{productList.map(renderCard)}</div>;
+};
