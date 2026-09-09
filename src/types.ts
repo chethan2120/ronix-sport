@@ -128,6 +128,42 @@ export interface B2BOrder {
   isDemo?: boolean;
 }
 
+export type CustomerOrderStatus = 'New' | 'Confirmed' | 'Processing' | 'Ready' | 'Shipped' | 'Delivered' | 'Cancelled';
+export type CustomerPaymentStatus = 'Pending' | 'Paid' | 'Failed' | 'Refunded';
+
+export interface CustomerOrderItem {
+  id?: string;
+  orderId?: string;
+  productId: string;
+  productName: string;
+  sku: string;
+  image?: string;
+  productType?: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
+export interface CustomerOrder {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  shippingAddress?: string;
+  date: string;
+  createdAt: string;
+  items: CustomerOrderItem[];
+  subtotal: number;
+  total: number;
+  status: CustomerOrderStatus;
+  paymentStatus: CustomerPaymentStatus;
+  restockedOnCancel?: boolean;
+  notes?: string;
+  isDemo?: boolean;
+}
+
 export interface B2CSale {
   id: string;
   saleNumber: string;

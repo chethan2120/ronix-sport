@@ -85,18 +85,20 @@ export const ProductImage: React.FC<ProductImageProps> = ({
     (product as any)?.photo;
 
   const sku = product?.sku || (product as any)?.SKU;
-  const skuAsset = sku ? getSkuProductAsset(sku) : null;
+  const prodCat = category || product?.category || '';
+  const prodName = name || product?.name || '';
+  const prodType = product?.productType || (product as any)?.subCategory || '';
+
+  const skuAsset = getSkuProductAsset(sku, prodCat, prodName, prodType);
 
   // User-uploaded images (Base64 data URLs or custom URLs) take #1 priority.
-  // Legacy unsplash URLs or missing images resolve to exact SKU product asset or fallback icon.
+  // Legacy unsplash URLs or missing images resolve to exact SKU/Product Type asset.
   const isCustomUserImage = Boolean(rawSrc && !rawSrc.includes('unsplash.com'));
   const imageSrc = isCustomUserImage
     ? rawSrc
     : (skuAsset || (rawSrc && !rawSrc.includes('unsplash.com') ? rawSrc : null));
 
   const imageAlt = alt || product?.name || 'Ronix Sports Equipment';
-  const prodCat = category || product?.category || '';
-  const prodName = name || product?.name || '';
 
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);

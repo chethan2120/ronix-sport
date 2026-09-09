@@ -1,4 +1,4 @@
-import { Product, InventoryItem, InventoryMovement, B2BOrder, B2CSale, Customer, PricingRule, Invoice, Quotation, Payment, AuditLog, Warehouse, User, NotificationItem } from '../types';
+import { Product, InventoryItem, InventoryMovement, B2BOrder, B2CSale, Customer, PricingRule, Invoice, Quotation, Payment, AuditLog, Warehouse, User, NotificationItem, CustomerOrder } from '../types';
 import { PRODUCT_ASSETS } from './productAssets';
 
 export const INITIAL_WAREHOUSES: Warehouse[] = [
@@ -1153,3 +1153,43 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     linkTab: 'payments',
   },
 ];
+
+export const INITIAL_CUSTOMER_ORDERS: CustomerOrder[] = [
+  {
+    id: 'ord-cust-1001',
+    orderNumber: 'ORD-1001',
+    customerId: 'cust-demo-1',
+    customerName: 'Rahul Customer',
+    customerEmail: 'customer@gmail.com',
+    customerPhone: '+91 98765 43210',
+    shippingAddress: 'No 45, MG Road, Bengaluru, Karnataka - 560001',
+    date: '08 Sep 2026',
+    createdAt: '2026-09-08T10:00:00.000Z',
+    items: [
+      {
+        productId: 'prod-bat-ew26',
+        productName: 'English Willow Bat 2.6',
+        sku: 'BAT-EW-2.6',
+        image: PRODUCT_ASSETS['BAT-EW-2.6'],
+        quantity: 2,
+        unitPrice: 2500,
+        subtotal: 5000,
+      },
+      {
+        productId: 'prod-ball-ten6',
+        productName: 'Tennis Ball (Pack of 6)',
+        sku: 'BAL-TEN-06',
+        image: PRODUCT_ASSETS['BAL-TEN-06'],
+        quantity: 3,
+        unitPrice: 180,
+        subtotal: 540,
+      },
+    ],
+    subtotal: 5540,
+    total: 5540,
+    status: 'New',
+    paymentStatus: 'Pending',
+    isDemo: true,
+  },
+];
+

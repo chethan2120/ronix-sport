@@ -5,6 +5,7 @@ import {
   Package,
   Boxes,
   ShoppingCart,
+  ShoppingBag,
   FileSpreadsheet,
   FileText,
   Users,
@@ -58,13 +59,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, setMobileOpen }) =
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin'] },
     { id: 'products', label: 'Products', icon: Package, roles: ['admin', 'stock'] },
     { id: 'inventory', label: 'Inventory', icon: Boxes, roles: ['admin', 'stock'] },
+    { id: 'customer-orders', label: 'Customer Orders', icon: ShoppingBag, isNew: true, roles: ['admin'] },
     { id: 'b2b-orders', label: 'B2B Orders', icon: ShoppingCart, roles: ['admin'] },
     { id: 'quotations', label: 'Quotations', icon: FileSpreadsheet, roles: ['admin'] },
     { id: 'invoices', label: 'Invoices', icon: FileText, roles: ['admin'] },
     { id: 'customers', label: 'Customers', icon: Users, roles: ['admin'] },
     { id: 'b2c-pos', label: 'POS / Counter Sales', icon: Receipt, roles: ['admin'] },
     { id: 'reports', label: 'Reports', icon: BarChart3, roles: ['admin'] },
-    { id: 'storefront', label: 'Customer Storefront', icon: Store, isNew: true, roles: ['admin'] },
+    { id: 'storefront', label: 'Customer Storefront', icon: Store, roles: ['admin'] },
   ];
 
   // Secondary management items filtered by role

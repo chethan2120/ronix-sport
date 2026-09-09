@@ -15,6 +15,10 @@ import {
   User,
   NotificationItem,
   OrderItem,
+  CustomerOrder,
+  CustomerOrderItem,
+  CustomerOrderStatus,
+  CustomerPaymentStatus,
 } from '../types';
 import {
   INITIAL_WAREHOUSES,
@@ -31,6 +35,7 @@ import {
   INITIAL_PAYMENTS,
   INITIAL_AUDIT_LOGS,
   INITIAL_NOTIFICATIONS,
+  INITIAL_CUSTOMER_ORDERS,
 } from '../data/initialData';
 import { getSkuProductAsset } from '../data/productAssets';
 
@@ -38,6 +43,7 @@ import { getSkuProductAsset } from '../data/productAssets';
 export const DEMO_PRODUCT_IDS = new Set(INITIAL_PRODUCTS.map((p) => p.id));
 export const DEMO_CUSTOMER_IDS = new Set(INITIAL_CUSTOMERS.map((c) => c.id));
 export const DEMO_ORDER_IDS = new Set(INITIAL_B2B_ORDERS.map((o) => o.id));
+export const DEMO_CUSTOMER_ORDER_IDS = new Set(INITIAL_CUSTOMER_ORDERS.map((o) => o.id));
 export const DEMO_SALE_IDS = new Set(INITIAL_B2C_SALES.map((s) => s.id));
 export const DEMO_INVOICE_IDS = new Set(INITIAL_INVOICES.map((i) => i.id));
 export const DEMO_QUOTATION_IDS = new Set(INITIAL_QUOTATIONS.map((q) => q.id));
@@ -107,6 +113,18 @@ interface StoreContextType {
     notes?: string;
   }) => { success: boolean; order?: B2BOrder; error?: string };
   updateB2BOrderStatus: (orderId: string, status: B2BOrder['status']) => void;
+
+  // Customer Storefront Orders
+  customerOrders: CustomerOrder[];
+  placeCustomerOrder: (orderData: {
+    customerId: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone?: string;
+    shippingAddress?: string;
+    items: { productId: string; quantity: number }[];
+  }) => { success: boolean; order?: CustomerOrder; error?: string };
+  updateCustomerOrderStatus: (orderId: string, status: CustomerOrderStatus, paymentStatus?: CustomerPaymentStatus) => void;
 
   // B2C Sales (POS) & D2C Storefront
   b2cSales: B2CSale[];
@@ -319,6 +337,15 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_b2b_orders`);
     return saved ? JSON.parse(saved) : tagWithDemo(INITIAL_B2B_ORDERS);
   });
+
+  const [customerOrders, setCustomerOrders] = useState<CustomerOrder[]>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_customer_orders`);
+    return saved ? JSON.parse(saved) : tagWithDemo(INITIAL_CUSTOMER_ORDERS);
+  });
+
+  useEffect(() => {
+    localStorage.setItem(`${LOCAL_STORAGE_KEY}_customer_orders`, JSON.stringify(customerOrders));
+  }, [customerOrders]);
 
   const [b2cSales, setB2cSales] = useState<B2CSale[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_b2c_sales`);
@@ -903,6 +930,157 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         if (ord.id === orderId) {
           logAudit('Updated Order Status', 'B2B Orders', `Order ${ord.orderNumber} status changed from ${ord.status} to ${status}`, ord.status, status, ord.orderNumber);
           return { ...ord, status };
+        }
+        return ord;
+      })
+    );
+  };
+
+  // Customer Storefront Order Placement & Shared Inventory Deduction
+  const placeCustomerOrder = (orderData: {
+    customerId: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone?: string;
+    shippingAddress?: string;
+    items: { productId: string; quantity: number }[];
+  }): { success: boolean; order?: CustomerOrder; error?: string } => {
+    if (!orderData.items || orderData.items.length === 0) {
+      return { success: false, error: 'Your order is empty. Please select products.' };
+    }
+
+    // Atomic Stock Check
+    for (const item of orderData.items) {
+      const inv = inventory[item.productId];
+      const prod = products.find((p) => p.id === item.productId);
+      if (!inv || !prod) {
+        return { success: false, error: `Product not found in inventory: ${item.productId}` };
+      }
+      const avail = Math.max(0, inv.onHand - inv.reserved);
+      if (item.quantity > avail) {
+        return {
+          success: false,
+          error: `Only ${avail} unit(s) available for "${prod.name}".`,
+        };
+      }
+    }
+
+    const orderNumber = `ORD-${Math.floor(1002 + customerOrders.length)}`;
+    let total = 0;
+    let subtotal = 0;
+
+    const orderItems: CustomerOrderItem[] = orderData.items.map((item) => {
+      const prod = products.find((p) => p.id === item.productId)!;
+      const itemTotal = prod.retailPrice * item.quantity;
+      total += itemTotal;
+      subtotal += itemTotal;
+
+      // Deduct stock from shared inventory immediately
+      adjustStock(
+        prod.id,
+        item.quantity,
+        'OUT',
+        `Customer Order ${orderNumber}`,
+        'wh-ret'
+      );
+
+      return {
+        id: `item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        productId: prod.id,
+        productName: prod.name,
+        sku: prod.sku,
+        image: prod.image,
+        productType: prod.productType,
+        quantity: item.quantity,
+        unitPrice: prod.retailPrice,
+        subtotal: itemTotal,
+      };
+    });
+
+    const newOrder: CustomerOrder = {
+      id: `ord-cust-${Date.now()}`,
+      orderNumber,
+      customerId: orderData.customerId,
+      customerName: orderData.customerName,
+      customerEmail: orderData.customerEmail,
+      customerPhone: orderData.customerPhone || '',
+      shippingAddress: orderData.shippingAddress || '',
+      date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+      createdAt: new Date().toISOString(),
+      items: orderItems,
+      subtotal,
+      total,
+      status: 'New',
+      paymentStatus: 'Pending',
+      isDemo: false,
+    };
+
+    setCustomerOrders((prev) => [newOrder, ...prev]);
+
+    logAudit(
+      'Placed Customer Order',
+      'B2C POS',
+      `Customer ${orderData.customerName} placed order ${orderNumber} for ₹${total.toLocaleString('en-IN')}`,
+      undefined,
+      `₹${total.toLocaleString('en-IN')}`,
+      orderNumber
+    );
+
+    setNotifications((prev) => [
+      {
+        id: `notif-cust-${Date.now()}`,
+        title: 'New Customer Order Received',
+        message: `${orderData.customerName} placed ${orderNumber} (₹${total.toLocaleString('en-IN')})`,
+        time: 'Just now',
+        type: 'order',
+        read: false,
+        linkTab: 'customer-orders',
+      },
+      ...prev,
+    ]);
+
+    return { success: true, order: newOrder };
+  };
+
+  const updateCustomerOrderStatus = (
+    orderId: string,
+    status: CustomerOrderStatus,
+    paymentStatus?: CustomerPaymentStatus
+  ) => {
+    setCustomerOrders((prev) =>
+      prev.map((ord) => {
+        if (ord.id === orderId) {
+          const isCancelling = status === 'Cancelled' && ord.status !== 'Cancelled';
+          const shouldRestock = isCancelling && !ord.restockedOnCancel;
+
+          if (shouldRestock) {
+            // Restore deducted stock for each item in the order
+            ord.items.forEach((item) => {
+              adjustStock(
+                item.productId,
+                item.quantity,
+                'IN',
+                `Order Cancelled ${ord.orderNumber}`,
+                'wh-ret'
+              );
+            });
+          }
+
+          logAudit(
+            'Updated Customer Order Status',
+            'B2C POS',
+            `Order ${ord.orderNumber} status changed from ${ord.status} to ${status}${shouldRestock ? ' (Stock Restored)' : ''}`,
+            ord.status,
+            status,
+            ord.orderNumber
+          );
+
+          return {
+            ...ord,
+            status,
+            ...(paymentStatus ? { paymentStatus } : {}),
+            ...(shouldRestock ? { restockedOnCancel: true } : {}),
+          };
         }
         return ord;
       })
@@ -1691,6 +1869,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     () => (isDemoMode ? b2bOrders : b2bOrders.filter((o) => !isDemoRecord(o, DEMO_ORDER_IDS))),
     [isDemoMode, b2bOrders]
   );
+  const visibleCustomerOrders = useMemo(
+    () => (isDemoMode ? customerOrders : customerOrders.filter((o) => !isDemoRecord(o, DEMO_CUSTOMER_ORDER_IDS))),
+    [isDemoMode, customerOrders]
+  );
   const visibleB2cSales = useMemo(
     () => (isDemoMode ? b2cSales : b2cSales.filter((s) => !isDemoRecord(s, DEMO_SALE_IDS))),
     [isDemoMode, b2cSales]
@@ -1750,6 +1932,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         b2bOrders: visibleB2bOrders,
         placeB2BOrder,
         updateB2BOrderStatus,
+        customerOrders: visibleCustomerOrders,
+        placeCustomerOrder,
+        updateCustomerOrderStatus,
         b2cSales: visibleB2cSales,
         createB2CSale,
         placeD2COrder,

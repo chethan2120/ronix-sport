@@ -394,14 +394,63 @@ export const PRODUCT_ASSETS: Record<string, string> = {
       <text x="40" y="295" font-family="sans-serif" font-weight="900" font-size="11" fill="%23FFFFFF">XX-HEAVY (45-50 LBS)</text>
     </g>
   </svg>`,
+
+  // 14. High Impact Plastic Cricket Bat (SKU: BAT-PL-01 / Plastic Bat)
+  'BAT-PL-01': `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+    <rect width="400" height="400" fill="%23FFFFFF"/>
+    <!-- Single Molded Yellow Plastic Cricket Bat -->
+    <g transform="translate(140, 20) rotate(12 60 180)">
+      <!-- Handle Rubber Grip -->
+      <rect x="52" y="10" width="16" height="110" rx="8" fill="%230284C7"/>
+      <line x1="52" y1="30" x2="68" y2="30" stroke="%230369A1" stroke-width="2"/>
+      <line x1="52" y1="50" x2="68" y2="50" stroke="%230369A1" stroke-width="2"/>
+      <line x1="52" y1="70" x2="68" y2="70" stroke="%230369A1" stroke-width="2"/>
+      <line x1="52" y1="90" x2="68" y2="90" stroke="%230369A1" stroke-width="2"/>
+      <!-- Cone Joint -->
+      <path d="M 48 115 L 72 115 L 76 140 L 44 140 Z" fill="%230F172A"/>
+      <!-- Plastic Bat Blade -->
+      <path d="M 44 140 L 76 140 C 80 200 82 280 78 340 C 76 355 68 360 60 360 C 52 360 44 355 42 340 C 38 280 40 200 44 140 Z" fill="%23FACC15" stroke="%23EAB308" stroke-width="2"/>
+      <!-- Molded Rib Highlights -->
+      <line x1="50" y1="150" x2="49" y2="345" stroke="%23FEF08A" stroke-width="2"/>
+      <line x1="70" y1="150" x2="71" y2="345" stroke="%23CA8A04" stroke-width="1.5"/>
+      <!-- Brand Sticker -->
+      <rect x="44" y="160" width="32" height="60" rx="4" fill="%23E31B23"/>
+      <text x="60" y="195" font-family="sans-serif" font-weight="900" font-size="9" fill="%23FFFFFF" text-anchor="middle">RONIX</text>
+      <!-- Plastic Toe Cap -->
+      <path d="M 42 340 C 44 355 52 360 60 360 C 68 360 76 355 78 340 L 78 348 C 76 360 68 365 60 365 C 52 365 44 360 42 348 Z" fill="%230284C7"/>
+    </g>
+  </svg>`,
 };
 
-// Helper function to resolve exact SKU product asset
-export const getSkuProductAsset = (sku?: string, fallbackCategory?: string, fallbackName?: string): string | null => {
-  if (!sku) return null;
-  const cleanSku = sku.trim().toUpperCase();
-  if (PRODUCT_ASSETS[cleanSku]) {
-    return PRODUCT_ASSETS[cleanSku];
+// Helper function to resolve exact SKU or Product Type asset
+export const getSkuProductAsset = (sku?: string, fallbackCategory?: string, fallbackName?: string, productType?: string): string | null => {
+  if (sku) {
+    const cleanSku = sku.trim().toUpperCase();
+    if (PRODUCT_ASSETS[cleanSku]) {
+      return PRODUCT_ASSETS[cleanSku];
+    }
   }
+
+  const queryText = `${sku || ''} ${productType || ''} ${fallbackName || ''} ${fallbackCategory || ''}`.toLowerCase();
+
+  if (queryText.includes('plastic bat')) return PRODUCT_ASSETS['BAT-PL-01'];
+  if (queryText.includes('english willow') || (queryText.includes('willow bat') && queryText.includes('2.6'))) return PRODUCT_ASSETS['BAT-EW-2.6'];
+  if (queryText.includes('kashmir willow')) return PRODUCT_ASSETS['BAT-KW-01'];
+  if (queryText.includes('tennis ball')) return PRODUCT_ASSETS['BAL-TEN-06'];
+  if (queryText.includes('helmet')) return PRODUCT_ASSETS['HLM-PRO-01'];
+  if (queryText.includes('glove')) return PRODUCT_ASSETS['GLV-BAT-02'];
+  if (queryText.includes('pad')) return PRODUCT_ASSETS['PAD-LEG-03'];
+  if (queryText.includes('kit bag') || (queryText.includes('bag') && queryText.includes('wheel'))) return PRODUCT_ASSETS['BAG-KIT-04'];
+  if (queryText.includes('leather') || queryText.includes('red ball')) return PRODUCT_ASSETS['BAL-LTH-01'];
+  if (queryText.includes('shoe') || queryText.includes('stud') || queryText.includes('footwear')) return PRODUCT_ASSETS['SHO-CRK-01'];
+  if (queryText.includes('football') || queryText.includes('soccer')) return PRODUCT_ASSETS['FB-PRO-05'];
+  if (queryText.includes('badminton') || queryText.includes('racket')) return PRODUCT_ASSETS['BAD-AERO-01'];
+  if (queryText.includes('basketball')) return PRODUCT_ASSETS['BB-GRIP-07'];
+  if (queryText.includes('resistance band') || queryText.includes('fitness band')) return PRODUCT_ASSETS['FIT-BND-05'];
+
+  if (queryText.includes('bat')) return PRODUCT_ASSETS['BAT-EW-2.6'];
+  if (queryText.includes('ball')) return PRODUCT_ASSETS['BAL-LTH-01'];
+
   return null;
 };
+

@@ -27,6 +27,7 @@ import { ReportsView } from './components/ReportsView';
 import { AuditTrailView } from './components/AuditTrailView';
 import { SettingsView } from './components/SettingsView';
 import { CustomerStorefront } from './components/storefront/CustomerStorefront';
+import { CustomerOrdersView } from './components/CustomerOrdersView';
 import {
   AddProductModal,
   RecordPaymentModal,
@@ -181,6 +182,16 @@ const CrmLayout: React.FC = () => {
                     onOpenAddProductModal={() => setIsAddProductOpen(true)}
                     onOpenAdjustStockModal={handleOpenAddStock}
                   />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Customer Orders (Admin Only) */}
+            <Route
+              path="/customer-orders"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <CustomerOrdersView />
                 </ProtectedRoute>
               }
             />

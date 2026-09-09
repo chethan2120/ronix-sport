@@ -157,3 +157,70 @@ CREATE POLICY "Stock staff insert stock movements" ON public.stock_movements
   FOR INSERT WITH CHECK (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'stock'))
   );
+
+-- 6. CUSTOMER ORDERS Table & RLS
+CREATE TABLE IF NOT EXISTS public.customer_orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_number TEXT UNIQUE NOT NULL,
+  customer_id UUID REFERENCES auth.users(id),
+  customer_name TEXT NOT NULL,
+  customer_email TEXT NOT NULL,
+  customer_phone TEXT,
+  shipping_address TEXT,
+  subtotal NUMERIC NOT NULL,
+  total NUMERIC NOT NULL,
+  status TEXT NOT NULL DEFAULT 'New' CHECK (status IN ('New', 'Confirmed', 'Processing', 'Ready', 'Shipped', 'Delivered', 'Cancelled')),
+  payment_status TEXT NOT NULL DEFAULT 'Pending' CHECK (payment_status IN ('Pending', 'Paid', 'Failed', 'Refunded')),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE public.customer_orders ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins full access to customer orders" ON public.customer_orders
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+CREATE POLICY "Customers read own orders" ON public.customer_orders
+  FOR SELECT USING (auth.uid() = customer_id);
+
+CREATE POLICY "Customers insert own orders" ON public.customer_orders
+  FOR INSERT WITH CHECK (auth.uid() = customer_id);
+
+-- 7. CUSTOMER ORDER ITEMS Table & RLS
+CREATE TABLE IF NOT EXISTS public.customer_order_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID REFERENCES public.customer_orders(id) ON DELETE CASCADE,
+  product_id TEXT REFERENCES public.products(id),
+  product_name TEXT NOT NULL,
+  sku TEXT NOT NULL,
+  quantity INT NOT NULL CHECK (quantity > 0),
+  unit_price NUMERIC NOT NULL,
+  subtotal NUMERIC NOT NULL
+);
+
+ALTER TABLE public.customer_order_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins full access to customer order items" ON public.customer_order_items
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+CREATE POLICY "Customers read own order items" ON public.customer_order_items
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.customer_orders
+      WHERE customer_orders.id = customer_order_items.order_id
+      AND customer_orders.customer_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Customers insert own order items" ON public.customer_order_items
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.customer_orders
+      WHERE customer_orders.id = customer_order_items.order_id
+      AND customer_orders.customer_id = auth.uid()
+    )
+  );
+
