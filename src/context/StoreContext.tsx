@@ -37,7 +37,7 @@ import {
   INITIAL_NOTIFICATIONS,
   INITIAL_CUSTOMER_ORDERS,
 } from '../data/initialData';
-import { getSkuProductAsset } from '../data/productAssets';
+import { getSkuProductAsset, getProductImage, RASTER_FALLBACK_IMAGE } from '../data/productAssets';
 
 // Demo Tracking Sets to identify initial sample/demo records reliably
 export const DEMO_PRODUCT_IDS = new Set(INITIAL_PRODUCTS.map((p) => p.id));
