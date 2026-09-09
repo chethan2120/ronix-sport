@@ -312,7 +312,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   const bookSlides = useMemo(() => [
     {
       id: 'football',
-      title: '⚽ FOOTBALL FAVORITES',
+      title: 'FOOTBALL FAVORITES',
       category: 'Football',
       badge: 'MATCH READY GEAR',
       desc: 'Match-ready footballs, stud shoes, goalkeeper gloves, and agility training gear.',
@@ -323,7 +323,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
     },
     {
       id: 'badminton',
-      title: '🏸 BADMINTON ESSENTIALS',
+      title: 'BADMINTON ESSENTIALS',
       category: 'Badminton',
       badge: 'PRO PERFORMANCE',
       desc: 'Tournament-grade rackets, nylon & feather shuttlecocks, court shoes, and kit bags.',
@@ -334,7 +334,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
     },
     {
       id: 'fitness',
-      title: '🏋️ FITNESS & GYM GEAR',
+      title: 'FITNESS & GYM GEAR',
       category: 'Fitness & Gym',
       badge: 'WORKOUT READY',
       desc: 'Hex dumbbells, resistance bands, non-slip yoga mats, and gym accessories.',
@@ -345,7 +345,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
     },
     {
       id: 'sportswear',
-      title: '👟 SPORTSWEAR & ACCESSORIES',
+      title: 'SPORTSWEAR & ACCESSORIES',
       category: 'Sportswear & Accessories',
       badge: 'ATHLETIC WEAR & GEAR',
       desc: 'Quick-dry training t-shirts, track pants, sports caps, cushioned socks, and duffel bags.',
@@ -920,7 +920,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                       <Flame className="w-3.5 h-3.5 fill-current" />
                       <span>LIMITED TIME OFFERS</span>
                     </div>
-                    <h2 className="text-2xl sm:text-3xl font-black tracking-tight">🔥 DEALS FOR YOU</h2>
+                    <h2 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2">
+                      <Flame className="w-6 h-6 text-amber-300 fill-amber-300" />
+                      <span>DEALS FOR YOU</span>
+                    </h2>
                   </div>
                   <p className="text-xs text-white/80 font-semibold max-w-xs">
                     Hand-picked active discounts configured directly by Ronix Admin.
@@ -937,7 +940,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
             <div className="flex items-end justify-between mb-6">
               <div>
                 <span className="text-xs font-black text-[#E31B23] uppercase tracking-widest block">MOST POPULAR GEAR</span>
-                <h2 className="text-2xl font-black text-[#111827] tracking-tight">🌟 Best Sellers</h2>
+                <h2 className="text-2xl font-black text-[#111827] tracking-tight flex items-center gap-2">
+                  <Star className="w-5 h-5 text-[#E31B23] fill-[#E31B23]" />
+                  <span>Best Sellers</span>
+                </h2>
               </div>
               <button
                 onClick={() => handleSelectCategory('All Gear')}
@@ -957,7 +963,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <span className="text-xs font-black text-[#E31B23] uppercase tracking-widest block">HOT THIS WEEK</span>
-                  <h2 className="text-2xl font-black text-[#111827] tracking-tight">⚡ Trending Now</h2>
+                  <h2 className="text-2xl font-black text-[#111827] tracking-tight flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-[#E31B23] fill-[#E31B23]" />
+                    <span>Trending Now</span>
+                  </h2>
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
@@ -996,7 +1005,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               <div>
                 <span className="text-xs font-black text-[#E31B23] uppercase tracking-widest block">SEASON SPECIAL</span>
                 <h2 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight flex items-center gap-2">
-                  🏏 CRICKET ESSENTIALS
+                  <Trophy className="w-6 h-6 text-[#E31B23]" />
+                  <span>CRICKET ESSENTIALS</span>
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 font-medium">
                   Match-ready bats, balls, protective equipment, and training essentials for every level of cricket.
@@ -1042,13 +1052,21 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   </div>
                 </div>
 
-                {/* Mini Equipment Collage Graphic */}
+                {/* Mini Equipment Visual Badges */}
                 <div className="relative py-2 flex items-center justify-center">
-                  <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-sm p-3.5 rounded-2xl border border-white/20 shadow-inner">
-                    <span className="text-2xl hover:scale-125 transition-transform cursor-default" title="Cricket Bat">🏏</span>
-                    <span className="text-2xl hover:scale-125 transition-transform cursor-default" title="Cricket Ball">⚾</span>
-                    <span className="text-2xl hover:scale-125 transition-transform cursor-default" title="Helmet">🪖</span>
-                    <span className="text-2xl hover:scale-125 transition-transform cursor-default" title="Protective Pads">🛡️</span>
+                  <div className="flex items-center space-x-2.5 bg-white/10 backdrop-blur-sm p-3 rounded-2xl border border-white/20 shadow-inner">
+                    <div className="px-2.5 py-1 rounded-lg bg-white/20 text-white text-[11px] font-black tracking-wider flex items-center gap-1">
+                      <Trophy className="w-3.5 h-3.5 text-amber-300" />
+                      <span>BATS</span>
+                    </div>
+                    <div className="px-2.5 py-1 rounded-lg bg-white/20 text-white text-[11px] font-black tracking-wider flex items-center gap-1">
+                      <Target className="w-3.5 h-3.5 text-red-300" />
+                      <span>BALLS</span>
+                    </div>
+                    <div className="px-2.5 py-1 rounded-lg bg-white/20 text-white text-[11px] font-black tracking-wider flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-sky-300" />
+                      <span>PADS</span>
+                    </div>
                   </div>
                 </div>
 
@@ -1152,7 +1170,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div className="text-center max-w-2xl mx-auto space-y-1">
               <span className="text-xs font-black text-[#E31B23] uppercase tracking-widest">CURATED COLLECTIONS</span>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">🎯 SHOP BY NEED</h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center justify-center gap-2.5">
+                <Target className="w-6 h-6 text-[#E31B23]" />
+                <span>SHOP BY NEED</span>
+              </h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">Find precisely what you need for tournament matches, daily drills, or team supplies.</p>
             </div>
 
@@ -1199,7 +1220,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
             <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-10 shadow-sm space-y-6">
               <div className="text-center max-w-xl mx-auto space-y-1">
                 <span className="text-xs font-black text-[#E31B23] uppercase tracking-widest">THE RONIX DIFFERENCE</span>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">🏆 WHY SHOP WITH RONIX SPORTS</h2>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center justify-center gap-2.5">
+                  <Award className="w-6 h-6 text-[#E31B23]" />
+                  <span>WHY SHOP WITH RONIX SPORTS</span>
+                </h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">

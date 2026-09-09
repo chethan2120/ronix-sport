@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail, ShieldAlert, CheckCircle2, ArrowRight, UserCheck, Package, Building2 } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ShieldAlert, CheckCircle2, ArrowRight, UserCheck, Package, Building2, Zap, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const LoginPage: React.FC = () => {
@@ -198,8 +198,9 @@ export const LoginPage: React.FC = () => {
 
         {/* Quick Demo Login Preset Bar */}
         <div className="mt-6 bg-white/80 backdrop-blur-xs p-4 rounded-2xl border border-slate-200 shadow-xs space-y-2.5 text-xs">
-          <span className="font-bold text-slate-500 uppercase text-[10px] tracking-wider block text-center">
-            ⚡ Quick Demo Accounts for Evaluation
+          <span className="font-bold text-slate-500 uppercase text-[10px] tracking-wider flex items-center justify-center gap-1.5 text-center">
+            <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+            <span>Quick Demo Accounts for Evaluation</span>
           </span>
           <div className="grid grid-cols-3 gap-2 text-center">
             <button
@@ -240,7 +241,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 className="text-slate-400 hover:text-slate-600 text-xs font-bold"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
