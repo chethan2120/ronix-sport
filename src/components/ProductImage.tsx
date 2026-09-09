@@ -28,15 +28,22 @@ export const ProductImage: React.FC<ProductImageProps> = ({
 
   const skuAsset = getSkuProductAsset(sku, prodCat);
 
-  const rawSrc =
+  const providedUrl =
     (product as any)?.image_url ||
     src ||
     product?.image ||
     (product as any)?.imageUrl ||
     (product as any)?.productImage ||
     (product as any)?.thumbnail ||
-    (product as any)?.photo ||
-    skuAsset;
+    (product as any)?.photo;
+
+  // Filter out any stale stadium photo URLs from previous cache
+  const isStaleStadiumUrl =
+    providedUrl &&
+    (providedUrl.includes('photo-1540747913346-19e32dc3e97e') || providedUrl.includes('photo-1579952363873-27f3bade9f55')) &&
+    skuAsset !== providedUrl;
+
+  const rawSrc = (!providedUrl || isStaleStadiumUrl) ? skuAsset : providedUrl;
 
   const initialImageSrc = rawSrc || RASTER_FALLBACK_IMAGE;
 
