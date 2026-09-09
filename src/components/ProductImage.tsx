@@ -37,23 +37,18 @@ export const ProductImage: React.FC<ProductImageProps> = ({
     (product as any)?.thumbnail ||
     (product as any)?.photo;
 
-  // Filter out any stale stadium photo URLs from previous cache
-  const isStaleStadiumUrl =
-    providedUrl &&
-    (providedUrl.includes('photo-1540747913346-19e32dc3e97e') || providedUrl.includes('photo-1579952363873-27f3bade9f55')) &&
-    skuAsset !== providedUrl;
+  const rawSrc = (sku && skuAsset && skuAsset !== RASTER_FALLBACK_IMAGE)
+    ? skuAsset
+    : (providedUrl || skuAsset || RASTER_FALLBACK_IMAGE);
 
-  const rawSrc = (!providedUrl || isStaleStadiumUrl) ? skuAsset : providedUrl;
-
-  const initialImageSrc = rawSrc || RASTER_FALLBACK_IMAGE;
+  const initialImageSrc = rawSrc;
 
   const [currentSrc, setCurrentSrc] = useState<string>(initialImageSrc);
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const newSrc = rawSrc || RASTER_FALLBACK_IMAGE;
-    setCurrentSrc(newSrc);
+    setCurrentSrc(rawSrc);
     setHasError(false);
     setIsLoaded(false);
   }, [rawSrc]);
@@ -61,7 +56,9 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   const handleError = () => {
     if (!hasError) {
       setHasError(true);
-      if (currentSrc !== RASTER_FALLBACK_IMAGE) {
+      if (skuAsset && currentSrc !== skuAsset) {
+        setCurrentSrc(skuAsset);
+      } else if (currentSrc !== RASTER_FALLBACK_IMAGE) {
         setCurrentSrc(RASTER_FALLBACK_IMAGE);
       }
     }

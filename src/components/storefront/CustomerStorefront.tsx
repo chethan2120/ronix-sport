@@ -714,32 +714,44 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
+            {/* RESPONSIVE CATEGORY CARDS: 4 Desktop, 2 Tablet/Mobile, 1 Small */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
               {categoriesList.map((cat) => (
                 <div
                   key={cat.name}
                   onClick={() => handleSelectCategory(cat.name)}
-                  className={`group relative rounded-2xl p-4 sm:p-5 border border-slate-200/80 ${cat.bgTint} hover:bg-white hover:border-[#E31B23] hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between h-[180px] transform hover:-translate-y-1`}
+                  className="group relative rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer h-[190px] sm:h-[210px] transform hover:-translate-y-1 border border-slate-200/60"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white p-1 border border-slate-200/60 shadow-xs flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform">
-                      <img src={cat.image} alt={cat.name} className="w-full h-full object-contain" loading="lazy" decoding="async" />
-                    </div>
-                    <span className="text-[10px] font-black text-slate-400 bg-white/80 px-2 py-0.5 rounded-full border border-slate-200">
+                  {/* Background Image Hero */}
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                  />
+
+                  {/* Dark Gradient Overlay for Text Readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent group-hover:from-black/90 transition-colors" />
+
+                  {/* Top Right Item Count Badge */}
+                  <div className="absolute top-3 right-3 z-10">
+                    <span className="text-[10px] sm:text-xs font-black text-white bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
                       {cat.count} Items
                     </span>
                   </div>
 
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-[#E31B23] transition-colors leading-tight">
+                  {/* Bottom Text Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 z-10 space-y-1">
+                    <h3 className="text-base sm:text-lg font-black text-white group-hover:text-red-400 transition-colors leading-tight">
                       {cat.name}
                     </h3>
-                    <p className="text-[10px] text-slate-500 font-medium line-clamp-1 mt-0.5">
+                    <p className="text-xs text-white/80 font-medium line-clamp-1">
                       {cat.desc}
                     </p>
-                    <div className="flex items-center gap-1 text-[10px] font-extrabold text-[#E31B23] mt-2 group-hover:translate-x-1 transition-transform">
+                    <div className="flex items-center gap-1.5 text-xs font-extrabold text-white pt-1 group-hover:translate-x-1.5 transition-transform">
                       <span>Explore</span>
-                      <ArrowRight className="w-3 h-3" />
+                      <ArrowRight className="w-3.5 h-3.5 text-[#E31B23]" />
                     </div>
                   </div>
                 </div>
@@ -829,9 +841,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
-                  {activeDiscountDeals.slice(0, 4).map((prod) => renderProductCard(prod))}
-                </div>
+                {renderProductSectionGrid(activeDiscountDeals.slice(0, 4))}
               </div>
             </section>
           )}
@@ -852,9 +862,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
-              {bestSellerProducts.map((prod) => renderProductCard(prod))}
-            </div>
+            {renderProductSectionGrid(bestSellerProducts)}
           </section>
 
           {/* TRENDING NOW (HORIZONTAL SCROLL) */}
@@ -906,8 +914,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               </div>
 
               {/* Right Product Grid */}
-              <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {cricketSectionProducts.map((prod) => renderProductCard(prod))}
+              <div className="lg:col-span-8">
+                {renderProductSectionGrid(cricketSectionProducts)}
               </div>
             </div>
           </section>
@@ -929,9 +937,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
-                {footballSectionProducts.map((prod) => renderProductCard(prod))}
-              </div>
+              {renderProductSectionGrid(footballSectionProducts)}
             </div>
           </section>
         </main>
