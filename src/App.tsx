@@ -138,11 +138,11 @@ const CrmLayout: React.FC = () => {
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        {/* Top Header */}
-        <Header onMenuToggle={() => setMobileOpen(!mobileOpen)} />
+        {/* Top Header (ERP pages only, not Customer Storefront) */}
+        {!isCustomerRole && !isStorefront && <Header onMenuToggle={() => setMobileOpen(!mobileOpen)} />}
 
         {/* Dynamic Main Workspace Content */}
-        <main className={`flex-1 overflow-y-auto ${isStorefront || isCustomerRole ? 'p-4 sm:p-6 max-w-[1600px] w-full mx-auto' : 'p-4 sm:p-6 lg:p-6.5 max-w-[1600px] w-full mx-auto'}`}>
+        <main className={`flex-1 overflow-y-auto ${isStorefront || isCustomerRole ? 'p-0 w-full' : 'p-4 sm:p-6 lg:p-6.5 max-w-[1600px] w-full mx-auto'}`}>
           <Routes>
             {/* Dashboard (Admin Only) */}
             <Route

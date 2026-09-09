@@ -165,35 +165,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
             )}
           </div>
 
-          <div className="h-7 w-[1px] bg-slate-200 hidden md:block"></div>
-
-          {/* Quick Demo Mode Switcher (Desktop/Tablet) */}
-          <button
-            id="header-demo-mode-toggle"
-            onClick={toggleDemoMode}
-            className={`px-2 py-1 rounded-lg text-[11px] font-bold hidden md:flex items-center gap-1.5 transition-all cursor-pointer select-none ${
-              isDemoMode
-                ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
-                : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
-            }`}
-            title={
-              isDemoMode
-                ? 'Demo Mode is ACTIVE (showing sample data). Click to turn OFF.'
-                : 'Demo Mode is OFF (showing real user data). Click to turn ON.'
-            }
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                isDemoMode ? 'bg-amber-500 animate-pulse' : 'bg-slate-400'
-              }`}
-            />
-            <span>
-              {isDemoMode ? 'Demo: ON' : 'Demo: OFF'}
-            </span>
-          </button>
-
-          <div className="h-7 w-[1px] bg-slate-200 hidden md:block"></div>
-
           {/* Notifications Bell */}
           <div className="relative">
             <button

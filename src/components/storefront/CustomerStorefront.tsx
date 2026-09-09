@@ -7,31 +7,21 @@ import {
   Filter,
   SlidersHorizontal,
   Star,
-  ShieldCheck,
-  Truck,
-  RotateCcw,
   ChevronRight,
   ChevronLeft,
-  MapPin,
-  Phone,
-  Mail,
   ArrowLeft,
   LogOut,
   Package,
   Tag,
   Zap,
-  Trophy,
   CheckCircle2,
-  Clock,
   Plus,
   Minus,
   Trash2,
   ArrowRight,
   Flame,
-  Check,
   Heart,
   Eye,
-  Percent,
 } from 'lucide-react';
 import { useStore, normalizeCategory } from '../../context/StoreContext';
 import { useAuth } from '../../context/AuthContext';
@@ -57,7 +47,6 @@ import {
   CricketKitPromoSVG,
   FootballPromoSVG,
   FitnessPromoSVG,
-  SpecificProductSVG,
 } from './SportsIllustrations';
 
 interface CustomerStorefrontProps {
@@ -80,6 +69,9 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   const [selectedSubtype, setSelectedSubtype] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Account Menu Popup State
+  const [showAccountDropdown, setShowAccountDropdown] = useState(false);
+
   // Modals & Drawers
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -87,7 +79,6 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [placedOrderSuccess, setPlacedOrderSuccess] = useState<CustomerOrder | null>(null);
 
   // Filters State
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -310,7 +301,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   };
 
   // Render Product Card
-  const renderProductCard = (prod: Product, compact = false) => {
+  const renderProductCard = (prod: Product) => {
     const inv = inventory[prod.id];
     const available = inv ? Math.max(0, inv.onHand - inv.reserved) : 0;
     const isOutOfStock = available <= 0;
@@ -325,11 +316,11 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
         className="group relative bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-xl hover:border-red-300 transition-all duration-300 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1"
       >
         {/* Top Badges & Wishlist */}
-        <div className="relative aspect-square w-full bg-slate-50/60 p-4 flex items-center justify-center border-b border-slate-100 overflow-hidden">
+        <div className="relative aspect-square w-full bg-slate-50/60 p-3 sm:p-4 flex items-center justify-center border-b border-slate-100 overflow-hidden">
           {/* Discount Badge */}
           {discInfo.hasDiscount && (
-            <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#E31B23] text-white shadow-2xs">
+            <div className="absolute top-2 left-2 z-10">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#E31B23] text-white shadow-2xs">
                 {discInfo.discountLabel}
               </span>
             </div>
@@ -338,20 +329,20 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
           {/* Wishlist Button */}
           <button
             onClick={(e) => toggleWishlist(prod.id, e)}
-            className="absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-xs border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#E31B23] hover:scale-110 transition-all shadow-xs"
+            className="absolute top-2 right-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 backdrop-blur-xs border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#E31B23] hover:scale-110 transition-all shadow-xs"
             title="Add to Wishlist"
           >
-            <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-[#E31B23] text-[#E31B23]' : ''}`} />
+            <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isWishlisted ? 'fill-[#E31B23] text-[#E31B23]' : ''}`} />
           </button>
 
-          {/* Product Image / SVG */}
+          {/* Product Image */}
           <ProductImage
             src={prod.image}
             alt={prod.name}
             category={prod.category}
             name={prod.name}
             product={prod}
-            className="w-full h-full object-contain group-hover:scale-108 transition-transform duration-300"
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
           />
 
           {/* Quick View overlay button */}
@@ -364,9 +355,9 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
         </div>
 
         {/* Content */}
-        <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between space-y-2">
+        <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-2">
           <div>
-            <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold mb-1">
+            <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 font-semibold mb-0.5">
               <span>{prod.brand}</span>
               <span className="text-[#E31B23] font-bold">{prod.category}</span>
             </div>
@@ -379,27 +370,24 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
           <div className="pt-2 border-t border-slate-100 space-y-2">
             {/* Price section */}
             <div className="flex items-baseline justify-between">
-              <div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-base sm:text-lg font-black text-slate-900">
-                    ₹{discInfo.finalPrice.toLocaleString('en-IN')}
+              <div className="flex items-baseline gap-1">
+                <span className="text-sm sm:text-base font-black text-slate-900">
+                  ₹{discInfo.finalPrice.toLocaleString('en-IN')}
+                </span>
+                {discInfo.hasDiscount && (
+                  <span className="text-[11px] text-slate-400 line-through font-medium">
+                    ₹{discInfo.originalPrice.toLocaleString('en-IN')}
                   </span>
-                  {discInfo.hasDiscount && (
-                    <span className="text-xs text-slate-400 line-through font-medium">
-                      ₹{discInfo.originalPrice.toLocaleString('en-IN')}
-                    </span>
-                  )}
-                </div>
+                )}
               </div>
 
-              {/* Stock status indicator */}
               <div>
                 {isOutOfStock ? (
-                  <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Out</span>
+                  <span className="text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Out</span>
                 ) : isLowStock ? (
-                  <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Low</span>
+                  <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Low</span>
                 ) : (
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">In Stock</span>
+                  <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">In Stock</span>
                 )}
               </div>
             </div>
@@ -408,7 +396,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
             <button
               onClick={(e) => handleAddToCart(prod, 1, e)}
               disabled={isOutOfStock}
-              className={`w-full py-2 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`w-full py-1.5 sm:py-2 px-3 rounded-xl font-black text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 isOutOfStock
                   ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                   : 'bg-[#E31B23] hover:bg-[#B5121B] text-white shadow-xs hover:shadow-md'
@@ -424,35 +412,13 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-20 md:pb-10">
-      {/* Top Banner Bar */}
-      <div className="bg-[#111827] text-white text-[11px] font-bold py-1.5 px-4 flex justify-between items-center border-b border-slate-800">
-        <div className="flex items-center space-x-3 mx-auto sm:mx-0">
-          <span className="bg-[#E31B23] text-white px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider">
-            OFFICIAL STORE
-          </span>
-          <span className="hidden sm:inline">100% Genuine Ronix Sports Equipment Direct Warehouse Shipping</span>
-        </div>
-        <div className="hidden md:flex items-center space-x-4 text-slate-300">
-          <span className="flex items-center gap-1"><Truck className="w-3 h-3 text-[#E31B23]" /> Free Express Shipping Over ₹999</span>
-          <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-[#E31B23]" /> Verified Warranty</span>
-          {onBackToCRM && (
-            <button
-              onClick={onBackToCRM}
-              className="text-[#E31B23] hover:underline font-extrabold flex items-center gap-1 cursor-pointer"
-            >
-              <LogOut className="w-3 h-3" />
-              <span>Admin CRM</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Main E-Commerce Header */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-24 md:pb-12 overflow-x-hidden">
+      {/* BRAND IDENTITY CUSTOMER HEADER */}
+      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between gap-4">
-            {/* Logo */}
+          {/* DESKTOP HEADER LAYOUT */}
+          <div className="hidden md:flex items-center justify-between gap-6">
+            {/* Logo + Brand Name */}
             <div
               onClick={() => {
                 setActiveTab('home');
@@ -460,9 +426,9 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                 setSelectedSubtype('All');
                 setSearchQuery('');
               }}
-              className="flex items-center space-x-2.5 cursor-pointer shrink-0"
+              className="flex items-center space-x-3 cursor-pointer shrink-0"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E31B23] to-[#990B11] flex items-center justify-center text-white font-black text-xl shadow-md">
+              <div className="w-10 h-10 rounded-xl bg-[#E31B23] flex items-center justify-center text-white font-black text-xl shadow-md">
                 R
               </div>
               <div>
@@ -470,13 +436,13 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   RONIX <span className="text-[#E31B23]">SPORTS</span>
                 </span>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mt-0.5">
-                  PREMIUM STORE
+                  SPORTS & FITNESS STORE
                 </span>
               </div>
             </div>
 
-            {/* Desktop Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-xl relative">
+            {/* Desktop Search Input */}
+            <div className="flex-1 max-w-xl relative">
               <input
                 type="text"
                 value={searchQuery}
@@ -486,101 +452,174 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                     setActiveTab('category');
                   }
                 }}
-                placeholder="Search cricket bats, footballs, dumbbells, badminton rackets..."
-                className="w-full pl-10 pr-10 py-2.5 bg-slate-100/80 border border-slate-200 rounded-full text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#E31B23] focus:bg-white transition-all shadow-inner"
+                placeholder="Search sports products..."
+                className="w-full pl-10 pr-10 py-2 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#E31B23] focus:bg-white transition-all"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 cursor-pointer"
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-700 cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               )}
             </div>
 
-            {/* Right Action Icons */}
-            <div className="flex items-center space-x-3 sm:space-x-4">
+            {/* Desktop Right Controls (My Orders, Cart, Single Account Area) */}
+            <div className="flex items-center space-x-4 shrink-0">
+              <button
+                onClick={() => setActiveTab('my-orders')}
+                className={`text-xs font-bold transition-colors cursor-pointer ${
+                  activeTab === 'my-orders' ? 'text-[#E31B23]' : 'text-slate-700 hover:text-[#E31B23]'
+                }`}
+              >
+                My Orders
+              </button>
+
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2.5 rounded-full bg-slate-100 hover:bg-red-50 hover:text-[#E31B23] text-slate-700 transition-colors cursor-pointer"
-                title="View Cart"
+                className="relative p-2 rounded-full bg-slate-100 hover:bg-red-50 hover:text-[#E31B23] text-slate-700 transition-colors cursor-pointer flex items-center gap-1 px-3"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-4 h-4" />
+                <span className="text-xs font-bold">Cart</span>
                 {totalCartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E31B23] text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-xs animate-bounce">
+                  <span className="ml-1 px-1.5 py-0.2 bg-[#E31B23] text-white text-[10px] font-black rounded-full">
                     {totalCartCount}
                   </span>
                 )}
               </button>
 
-              <button
-                onClick={() => setActiveTab('account')}
-                className="flex items-center space-x-2 p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
-              >
-                <div className="w-6 h-6 rounded-full bg-[#E31B23] text-white flex items-center justify-center font-black text-[11px]">
-                  {profile?.full_name?.charAt(0) || 'C'}
-                </div>
-                <span className="hidden sm:inline max-w-[100px] truncate">{profile?.full_name?.split(' ')[0] || 'Customer'}</span>
-              </button>
+              {/* Single User Account Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowAccountDropdown(!showAccountDropdown)}
+                  className="flex items-center space-x-2 p-1.5 px-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors cursor-pointer border border-slate-200"
+                >
+                  <div className="w-6 h-6 rounded-full bg-[#E31B23] text-white flex items-center justify-center font-black text-[11px]">
+                    {profile?.full_name?.charAt(0) || 'C'}
+                  </div>
+                  <span className="max-w-[120px] truncate">{profile?.full_name || 'Rahul'}</span>
+                </button>
+
+                {showAccountDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                    <div className="px-4 py-2 border-b border-slate-100">
+                      <p className="text-xs font-black text-slate-900 truncate">{profile?.full_name || 'Rahul'}</p>
+                      <p className="text-[10px] text-slate-400 truncate">{profile?.email || 'customer@gmail.com'}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setActiveTab('account');
+                        setShowAccountDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                    >
+                      Profile & Account
+                    </button>
+                    <button
+                      onClick={() => {
+                        setActiveTab('my-orders');
+                        setShowAccountDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                    >
+                      My Orders
+                    </button>
+                    {onBackToCRM && (
+                      <button
+                        onClick={() => {
+                          setShowAccountDropdown(false);
+                          onBackToCRM();
+                        }}
+                        className="w-full text-left px-4 py-2 text-xs font-bold text-[#E31B23] hover:bg-red-50 cursor-pointer"
+                      >
+                        Admin CRM
+                      </button>
+                    )}
+                    <button
+                      onClick={() => signOut()}
+                      className="w-full text-left px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 border-t border-slate-100 cursor-pointer"
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Mobile Search Bar */}
-          <div className="mt-3 md:hidden relative">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                if (e.target.value.trim() && activeTab !== 'category') {
-                  setActiveTab('category');
-                }
-              }}
-              placeholder="Search sports gear..."
-              className="w-full pl-9 pr-8 py-2 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#E31B23]"
-            />
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-2.5 text-slate-400"
+          {/* MOBILE HEADER LAYOUT */}
+          <div className="md:hidden space-y-2.5">
+            {/* ROW 1: Logo & Brand + Cart & Account */}
+            <div className="flex items-center justify-between">
+              <div
+                onClick={() => {
+                  setActiveTab('home');
+                  setSelectedCategory('All Gear');
+                  setSelectedSubtype('All');
+                  setSearchQuery('');
+                }}
+                className="flex items-center space-x-2 cursor-pointer"
               >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+                <div className="w-8 h-8 rounded-lg bg-[#E31B23] flex items-center justify-center text-white font-black text-lg shadow-xs">
+                  R
+                </div>
+                <div>
+                  <span className="text-base font-black tracking-tight text-[#111827] block leading-none">
+                    RONIX <span className="text-[#E31B23]">SPORTS</span>
+                  </span>
+                </div>
+              </div>
 
-          {/* Horizontal Category Chips Navigation */}
-          <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar pt-3 text-xs font-bold border-t border-slate-100 mt-2">
-            <button
-              onClick={() => {
-                setActiveTab('home');
-                setSelectedCategory('All Gear');
-                setSelectedSubtype('All');
-              }}
-              className={`px-4 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer ${
-                activeTab === 'home' && selectedCategory === 'All Gear'
-                  ? 'bg-[#E31B23] text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              🔥 Featured Home
-            </button>
-            {categoriesList.map((cat) => (
-              <button
-                key={cat.name}
-                onClick={() => handleSelectCategory(cat.name)}
-                className={`px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer ${
-                  selectedCategory === cat.name
-                    ? 'bg-[#E31B23] text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                {cat.name}
-              </button>
-            ))}
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative p-2 rounded-full bg-slate-100 text-slate-700 cursor-pointer"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  {totalCartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E31B23] text-white text-[9px] font-black rounded-full flex items-center justify-center">
+                      {totalCartCount}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('account')}
+                  className="flex items-center space-x-1.5 p-1 px-2.5 rounded-full bg-slate-100 text-slate-800 text-xs font-bold cursor-pointer"
+                >
+                  <div className="w-5 h-5 rounded-full bg-[#E31B23] text-white flex items-center justify-center font-black text-[10px]">
+                    {profile?.full_name?.charAt(0) || 'R'}
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* ROW 2: Mobile Search Input */}
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (e.target.value.trim() && activeTab !== 'category') {
+                    setActiveTab('category');
+                  }
+                }}
+                placeholder="Search sports gear..."
+                className="w-full pl-9 pr-8 py-2 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#E31B23]"
+              />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-2.5 text-slate-400"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -601,12 +640,11 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
         <main className="space-y-10 sm:space-y-12">
           {/* HERO CAROUSEL SECTION */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-            <div className={`relative rounded-3xl overflow-hidden shadow-2xl text-white ${heroSlides[heroIndex].bg} transition-all duration-500 min-h-[320px] sm:min-h-[380px] flex items-center`}>
+            <div className={`relative rounded-3xl overflow-hidden shadow-xl text-white ${heroSlides[heroIndex].bg} transition-all duration-500 min-h-[300px] sm:min-h-[360px] flex items-center`}>
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 sm:p-10 w-full items-center">
                 {/* Left Text Column */}
                 <div className="lg:col-span-7 space-y-4 z-10">
                   <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs font-black tracking-widest uppercase">
-                    <SparklesIcon className="w-3.5 h-3.5 text-yellow-300" />
                     <span>{heroSlides[heroIndex].badge}</span>
                   </div>
 
@@ -692,10 +730,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                 <div
                   key={cat.name}
                   onClick={() => handleSelectCategory(cat.name)}
-                  className={`group relative rounded-2xl p-4 sm:p-5 border border-slate-200/80 ${cat.bgTint} hover:bg-white hover:border-[#E31B23] hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between h-[190px] transform hover:-translate-y-1`}
+                  className={`group relative rounded-2xl p-4 sm:p-5 border border-slate-200/80 ${cat.bgTint} hover:bg-white hover:border-[#E31B23] hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between h-[180px] transform hover:-translate-y-1`}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="w-14 h-14 rounded-2xl bg-white p-2 border border-slate-200/60 shadow-xs flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white p-2 border border-slate-200/60 shadow-xs flex items-center justify-center group-hover:scale-110 transition-transform">
                       <cat.Svg />
                     </div>
                     <span className="text-[10px] font-black text-slate-400 bg-white/80 px-2 py-0.5 rounded-full border border-slate-200">
@@ -704,13 +742,13 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   </div>
 
                   <div>
-                    <h3 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#E31B23] transition-colors leading-tight">
+                    <h3 className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-[#E31B23] transition-colors leading-tight">
                       {cat.name}
                     </h3>
-                    <p className="text-[11px] text-slate-500 font-medium line-clamp-1 mt-0.5">
+                    <p className="text-[10px] text-slate-500 font-medium line-clamp-1 mt-0.5">
                       {cat.desc}
                     </p>
-                    <div className="flex items-center gap-1 text-[11px] font-extrabold text-[#E31B23] mt-2 group-hover:translate-x-1 transition-transform">
+                    <div className="flex items-center gap-1 text-[10px] font-extrabold text-[#E31B23] mt-2 group-hover:translate-x-1 transition-transform">
                       <span>Explore</span>
                       <ArrowRight className="w-3 h-3" />
                     </div>
@@ -845,8 +883,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
               <div className="flex space-x-4 overflow-x-auto pb-4 no-scrollbar">
                 {trendingProducts.map((prod) => (
-                  <div key={prod.id} className="w-[200px] sm:w-[220px] shrink-0">
-                    {renderProductCard(prod, true)}
+                  <div key={prod.id} className="w-[180px] sm:w-[220px] shrink-0">
+                    {renderProductCard(prod)}
                   </div>
                 ))}
               </div>
@@ -857,7 +895,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-3xl border border-slate-200/90 shadow-md p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
               {/* Left Promo Box */}
-              <div className="lg:col-span-4 bg-gradient-to-br from-[#E31B23] to-[#800A0F] rounded-2xl p-6 text-white space-y-4 shadow-lg flex flex-col justify-between min-h-[300px]">
+              <div className="lg:col-span-4 bg-gradient-to-br from-[#E31B23] to-[#800A0F] rounded-2xl p-6 text-white space-y-4 shadow-lg flex flex-col justify-between min-h-[280px]">
                 <div className="space-y-2">
                   <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2.5 py-0.5 rounded-full border border-white/20">
                     SEASON SPECIAL
@@ -904,49 +942,6 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
                 {footballSectionProducts.map((prod) => renderProductCard(prod))}
-              </div>
-            </div>
-          </section>
-
-          {/* BADMINTON & FITNESS DUAL SECTIONS */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-              {/* Badminton */}
-              <div className="bg-sky-50/60 rounded-3xl border border-sky-200/80 p-6 space-y-5">
-                <div className="flex items-center justify-between border-b border-sky-200/80 pb-3">
-                  <div>
-                    <h3 className="text-xl font-black text-slate-900">🏸 BADMINTON PICKS</h3>
-                    <p className="text-xs text-slate-500 font-medium">Graphite Rackets & Feather Shuttles</p>
-                  </div>
-                  <button
-                    onClick={() => handleSelectCategory('Badminton')}
-                    className="text-xs font-bold text-sky-800 hover:underline cursor-pointer"
-                  >
-                    View All &rarr;
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  {badmintonSectionProducts.slice(0, 2).map((prod) => renderProductCard(prod))}
-                </div>
-              </div>
-
-              {/* Fitness */}
-              <div className="bg-indigo-50/60 rounded-3xl border border-indigo-200/80 p-6 space-y-5">
-                <div className="flex items-center justify-between border-b border-indigo-200/80 pb-3">
-                  <div>
-                    <h3 className="text-xl font-black text-slate-900">🏋 TRAINING ZONE</h3>
-                    <p className="text-xs text-slate-500 font-medium">Dumbbells, Mats & Resistance Bands</p>
-                  </div>
-                  <button
-                    onClick={() => handleSelectCategory('Fitness & Gym')}
-                    className="text-xs font-bold text-indigo-800 hover:underline cursor-pointer"
-                  >
-                    View All &rarr;
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  {fitnessSectionProducts.slice(0, 2).map((prod) => renderProductCard(prod))}
-                </div>
               </div>
             </div>
           </section>
@@ -1143,7 +1138,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
               {profile?.full_name?.charAt(0) || 'C'}
             </div>
             <div>
-              <h2 className="text-xl font-black text-slate-900">{profile?.full_name || 'Customer Account'}</h2>
+              <h2 className="text-xl font-black text-slate-900">{profile?.full_name || 'Rahul'}</h2>
               <p className="text-xs text-slate-500 font-medium">{profile?.email || 'customer@gmail.com'}</p>
               <span className="inline-block mt-2 px-3 py-0.5 rounded-full bg-red-50 text-[#E31B23] text-[10px] font-black uppercase tracking-wider">
                 REGISTERED CUSTOMER
@@ -1184,7 +1179,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
             activeTab === 'home' ? 'text-[#E31B23]' : 'text-slate-500'
           }`}
         >
-          <SparklesIcon className="w-5 h-5" />
+          <HomeIcon className="w-5 h-5" />
           <span>Home</span>
         </button>
 
@@ -1262,11 +1257,12 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   );
 };
 
-// Helper Sparkles Icon
-function SparklesIcon(props: React.SVGProps<SVGSVGElement>) {
+// Helper Home Icon
+function HomeIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
   );
 }

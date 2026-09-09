@@ -133,8 +133,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, setMobileOpen }) =
           </span>
         </div>
 
-        {/* Mobile Controls Section: Branch & Demo Mode */}
-        <div className="px-3 py-2 bg-[#F8F9FA] border-b border-slate-200 lg:hidden space-y-2">
+        {/* Mobile Controls Section: Branch Selector */}
+        <div className="px-3 py-2 bg-[#F8F9FA] border-b border-slate-200 lg:hidden">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">
               <Building2 className="w-3.5 h-3.5 text-[#E31B23]" />
@@ -154,20 +154,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, setMobileOpen }) =
                 </option>
               ))}
             </select>
-          </div>
-          <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
-            <span className="text-[10px] font-bold text-slate-500 uppercase">Demo Data</span>
-            <button
-              onClick={toggleDemoMode}
-              className={`px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                isDemoMode
-                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                  : 'bg-white text-slate-700 border border-slate-200'
-              }`}
-            >
-              <span className={`w-2 h-2 rounded-full ${isDemoMode ? 'bg-amber-500 animate-pulse' : 'bg-slate-400'}`} />
-              <span>{isDemoMode ? 'Demo ON' : 'Demo OFF'}</span>
-            </button>
           </div>
         </div>
 
