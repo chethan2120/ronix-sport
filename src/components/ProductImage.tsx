@@ -26,7 +26,7 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   const prodCat = category || product?.category || '';
   const prodName = name || product?.name || '';
 
-  const skuAsset = getSkuProductAsset(sku, prodCat);
+  const skuAsset = getSkuProductAsset(sku, prodCat, prodName);
 
   const providedUrl =
     (product as any)?.image_url ||
@@ -37,9 +37,14 @@ export const ProductImage: React.FC<ProductImageProps> = ({
     (product as any)?.thumbnail ||
     (product as any)?.photo;
 
-  const rawSrc = (sku && skuAsset && skuAsset !== RASTER_FALLBACK_IMAGE)
+  const isDumbbellUrl = providedUrl && providedUrl.includes('photo-1584735935682-2f2b69dff9d2');
+  const isFitnessProduct = prodCat.toLowerCase().includes('fit') || prodName.toLowerCase().includes('dumbbell') || prodName.toLowerCase().includes('weight');
+
+  const validProvidedUrl = (isDumbbellUrl && !isFitnessProduct) ? null : providedUrl;
+
+  const rawSrc = (skuAsset && skuAsset !== RASTER_FALLBACK_IMAGE)
     ? skuAsset
-    : (providedUrl || skuAsset || RASTER_FALLBACK_IMAGE);
+    : (validProvidedUrl || skuAsset || RASTER_FALLBACK_IMAGE);
 
   const initialImageSrc = rawSrc;
 

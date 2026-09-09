@@ -306,7 +306,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return loaded.map((p) => {
       const sanitized = sanitizeProduct(p);
       const skuAsset = getSkuProductAsset(sanitized.sku, sanitized.category, sanitized.name, sanitized.productType);
-      const imgUrl = skuAsset || (sanitized as any).image_url || sanitized.image || RASTER_FALLBACK_IMAGE;
+      const imgUrl = (skuAsset && skuAsset !== RASTER_FALLBACK_IMAGE)
+        ? skuAsset
+        : getProductImage(sanitized);
       return {
         ...sanitized,
         image_url: imgUrl,
