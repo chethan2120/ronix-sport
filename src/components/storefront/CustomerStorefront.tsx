@@ -407,7 +407,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-24 md:pb-12 overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-16 md:pb-0 overflow-x-hidden">
       {/* BRAND IDENTITY CUSTOMER HEADER */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">

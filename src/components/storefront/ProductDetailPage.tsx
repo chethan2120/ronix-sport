@@ -14,7 +14,7 @@ import {
   Heart,
   Package,
 } from 'lucide-react';
-import { Product } from '../../types';
+import { Product, getEffectiveProductPrice } from '../../types';
 import { useStore } from '../../context/StoreContext';
 import { ProductImage } from '../ProductImage';
 
@@ -45,10 +45,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   const discInfo = getEffectiveProductPrice(product);
 
-  // Related products
-  const relatedProducts = products
-    .filter((p) => p.id !== product.id && (p.category === product.category || p.brand === product.brand))
-    .slice(0, 4);
+  // Related products with fallback to other products
+  let relatedProducts = products.filter(
+    (p) => p.id !== product.id && (p.category === product.category || p.brand === product.brand)
+  );
+  if (relatedProducts.length < 4) {
+    const existingIds = new Set([product.id, ...relatedProducts.map((p) => p.id)]);
+    const fillers = products.filter((p) => !existingIds.has(p.id));
+    relatedProducts = [...relatedProducts, ...fillers];
+  }
+  relatedProducts = relatedProducts.slice(0, 4);
 
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href);
@@ -148,23 +154,37 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             </div>
 
             {/* Price Box */}
-            <div className="p-4 rounded-xl bg-[#F8F9FA] border border-slate-200 space-y-1">
-              <div className="flex items-baseline space-x-3">
-                <span className="text-3xl font-black text-[#111827]">
-                  ₹{discInfo.finalPrice.toLocaleString('en-IN')}
-                </span>
-                {discInfo.hasDiscount && (
-                  <>
-                    <span className="text-base text-slate-400 line-through font-medium">
-                      ₹{discInfo.originalPrice.toLocaleString('en-IN')}
+            <div className="p-4 rounded-xl bg-[#F8F9FA] border border-slate-200 space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Retail Price</span>
+                  <div className="flex items-baseline space-x-2">
+                    <span className="text-3xl font-black text-[#111827]">
+                      ₹{discInfo.finalPrice.toLocaleString('en-IN')}
                     </span>
-                    <span className="text-xs font-black text-[#E31B23] bg-red-50 px-2.5 py-0.5 rounded-md border border-red-100">
-                      {discInfo.discountLabel}
+                    {discInfo.hasDiscount && (
+                      <>
+                        <span className="text-base text-slate-400 line-through font-medium">
+                          ₹{discInfo.originalPrice.toLocaleString('en-IN')}
+                        </span>
+                        <span className="text-xs font-black text-[#E31B23] bg-red-50 px-2.5 py-0.5 rounded-md border border-red-100">
+                          {discInfo.discountLabel}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {product.b2bPrice && (
+                  <div className="text-right">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">B2B Wholesale</span>
+                    <span className="text-lg font-black text-[#E31B23]">
+                      ₹{product.b2bPrice.toLocaleString('en-IN')}
                     </span>
-                  </>
+                  </div>
                 )}
               </div>
-              <p className="text-[11px] text-slate-500">Inclusive of all taxes &bull; Free standard delivery</p>
+              <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">Inclusive of all taxes &bull; Free standard delivery</p>
             </div>
 
             {/* Stock Indicator */}
