@@ -121,7 +121,7 @@ export const SportsCategoryCarousel: React.FC<SportsCategoryCarouselProps> = ({
   if (!slides || slides.length === 0) return null;
 
   return (
-    <section className="max-w-5xl mx-auto px-4 py-2">
+    <section className="max-w-5xl mx-auto px-4 py-4 sm:py-6">
       {/* Container with hover pause, keyboard focus, & swipe listeners */}
       <div
         ref={carouselRef}
@@ -133,91 +133,80 @@ export const SportsCategoryCarousel: React.FC<SportsCategoryCarouselProps> = ({
         onBlur={() => setIsPaused(false)}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative outline-none focus:ring-2 focus:ring-[#E31B23]/40 focus:ring-offset-2 rounded-2xl"
+        className="relative outline-none focus:ring-2 focus:ring-[#E31B23]/40 focus:ring-offset-2 rounded-2xl w-full"
         aria-label="Match Ready Gear Category Carousel"
       >
-        {/* Layered Stack Container - Compact Height */}
-        <div className="relative min-h-[420px] max-h-[460px] flex items-center justify-center">
+        {/* Carousel Container - Natural height without section overlap */}
+        <div className="relative w-full">
           {slides.map((slide, slideIdx) => {
             const isActive = slideIdx === activeIndex;
-            const isPrev = slideIdx === (activeIndex - 1 + slides.length) % slides.length;
-            const isNext = slideIdx === (activeIndex + 1) % slides.length;
-
-            let cardStateClasses = 'hidden pointer-events-none opacity-0 scale-95 z-0';
-
-            if (isActive) {
-              cardStateClasses =
-                'relative z-20 opacity-100 scale-100 shadow-xl pointer-events-auto blur-none';
-            } else if (isPrev && !prefersReducedMotion) {
-              cardStateClasses =
-                'absolute z-10 opacity-20 scale-[0.96] -translate-x-3 blur-[1px] pointer-events-none hidden md:block';
-            } else if (isNext && !prefersReducedMotion) {
-              cardStateClasses =
-                'absolute z-10 opacity-20 scale-[0.96] translate-x-3 blur-[1px] pointer-events-none hidden md:block';
-            }
-
-            // Reduced motion override
-            if (prefersReducedMotion && !isActive) {
-              cardStateClasses = 'hidden';
-            }
+            if (!isActive) return null;
 
             return (
               <div
                 key={slide.id}
-                className={`w-full transition-all duration-300 ease-out rounded-2xl border p-4 sm:p-5 space-y-4 ${slide.bgTint} ${slide.accentBorder} ${cardStateClasses}`}
+                className={`w-full transition-all duration-300 ease-out rounded-2xl border p-4 sm:p-6 space-y-4 shadow-md ${slide.bgTint} ${slide.accentBorder}`}
               >
-                {/* Single Compact Header Row */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
-                  <div className="flex items-center space-x-3 flex-wrap gap-y-1">
-                    <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full border ${slide.badgeStyle}`}>
-                      {slide.badge}
-                    </span>
+                {/* Header Row */}
+                <div className="space-y-3 border-b border-slate-200/80 pb-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center space-x-2.5 flex-wrap gap-y-1">
+                      <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full border ${slide.badgeStyle}`}>
+                        {slide.badge}
+                      </span>
 
-                    <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                      {slide.title}
-                    </h2>
+                      <h2 className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                        {slide.title}
+                      </h2>
+                    </div>
 
-                    <span className="text-[11px] font-bold text-slate-500 bg-white/80 px-2 py-0.5 rounded-full border border-slate-200">
+                    <span className="text-[11px] font-bold text-slate-500 bg-white/80 px-2 py-0.5 rounded-full border border-slate-200 shrink-0">
                       {slideIdx + 1} / {slides.length}
                     </span>
                   </div>
 
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                    {slide.desc}
+                  </p>
+
                   {/* Compact Header Controls */}
-                  <div className="flex items-center space-x-2 shrink-0">
-                    <button
-                      onClick={prevSlide}
-                      className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-[#E31B23] flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
-                      title="Previous Category"
-                      aria-label="Previous Category"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={prevSlide}
+                        className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-[#E31B23] flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                        title="Previous Category"
+                        aria-label="Previous Category"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
 
-                    {/* Dots Indicator */}
-                    <div className="flex items-center space-x-1 px-1">
-                      {slides.map((_, dotIdx) => (
-                        <button
-                          key={dotIdx}
-                          onClick={() => setActiveIndex(dotIdx)}
-                          className={`h-2 rounded-full transition-all cursor-pointer ${
-                            activeIndex === dotIdx
-                              ? 'bg-[#E31B23] w-5 shadow-xs'
-                              : 'bg-slate-300 hover:bg-slate-400 w-2'
-                          }`}
-                          title={`Go to slide ${dotIdx + 1}`}
-                          aria-label={`Go to slide ${dotIdx + 1}`}
-                        />
-                      ))}
+                      {/* Dots Indicator */}
+                      <div className="flex items-center space-x-1 px-1">
+                        {slides.map((_, dotIdx) => (
+                          <button
+                            key={dotIdx}
+                            onClick={() => setActiveIndex(dotIdx)}
+                            className={`h-2 rounded-full transition-all cursor-pointer ${
+                              activeIndex === dotIdx
+                                ? 'bg-[#E31B23] w-5 shadow-xs'
+                                : 'bg-slate-300 hover:bg-slate-400 w-2'
+                            }`}
+                            title={`Go to slide ${dotIdx + 1}`}
+                            aria-label={`Go to slide ${dotIdx + 1}`}
+                          />
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={nextSlide}
+                        className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-[#E31B23] flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                        title="Next Category"
+                        aria-label="Next Category"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
                     </div>
-
-                    <button
-                      onClick={nextSlide}
-                      className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-[#E31B23] flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
-                      title="Next Category"
-                      aria-label="Next Category"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
 
                     <button
                       onClick={() => {
@@ -232,12 +221,7 @@ export const SportsCategoryCarousel: React.FC<SportsCategoryCarouselProps> = ({
                   </div>
                 </div>
 
-                {/* Subtitle Description */}
-                <p className="text-xs text-slate-600 font-medium -mt-1">
-                  {slide.desc}
-                </p>
-
-                {/* Slide Products Preview Grid: EXACTLY 2 CARDS ONLY */}
+                {/* Slide Products Preview Grid: 1 card per row on mobile (grid-cols-1), 2 cards per row on desktop (sm:grid-cols-2) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-3xl mx-auto">
                   {slide.products.slice(0, 2).map((prod) => {
                     const inv = inventory[prod.id];
@@ -254,13 +238,13 @@ export const SportsCategoryCarousel: React.FC<SportsCategoryCarouselProps> = ({
                           onSelectProduct(prod);
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className="group relative bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-2xs hover:shadow-md hover:border-red-300 transition-all duration-200 flex flex-col justify-between cursor-pointer"
+                        className="group relative bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-2xs hover:shadow-md hover:border-red-300 transition-all duration-200 flex flex-col justify-between cursor-pointer w-full"
                       >
-                        {/* Image Container: White background, compact height (28 sm:32), centered object-contain */}
-                        <div className="relative h-28 sm:h-32 w-full bg-white p-2 flex items-center justify-center border-b border-slate-100 overflow-hidden">
+                        {/* Image Container */}
+                        <div className="relative h-32 sm:h-36 w-full bg-white p-3 flex items-center justify-center border-b border-slate-100 overflow-hidden">
                           {discInfo.hasDiscount && (
-                            <div className="absolute top-1.5 left-1.5 z-10">
-                              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-[#E31B23] text-white shadow-2xs">
+                            <div className="absolute top-2 left-2 z-10">
+                              <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-[#E31B23] text-white shadow-2xs">
                                 {discInfo.discountLabel}
                               </span>
                             </div>
@@ -269,10 +253,10 @@ export const SportsCategoryCarousel: React.FC<SportsCategoryCarouselProps> = ({
                           {onToggleWishlist && (
                             <button
                               onClick={(e) => onToggleWishlist(prod.id, e)}
-                              className="absolute top-1.5 right-1.5 z-10 w-6 h-6 rounded-full bg-white/90 backdrop-blur-xs border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#E31B23] transition-all shadow-xs"
+                              className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur-xs border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#E31B23] transition-all shadow-xs"
                               title="Add to Wishlist"
                             >
-                              <Heart className={`w-3 h-3 ${isWishlisted ? 'fill-[#E31B23] text-[#E31B23]' : ''}`} />
+                              <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-[#E31B23] text-[#E31B23]' : ''}`} />
                             </button>
                           )}
 
@@ -293,27 +277,27 @@ export const SportsCategoryCarousel: React.FC<SportsCategoryCarouselProps> = ({
                           </div>
                         </div>
 
-                        {/* Card Info: Compact layout */}
-                        <div className="p-3 flex-1 flex flex-col justify-between space-y-1.5">
+                        {/* Card Info */}
+                        <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-2">
                           <div>
-                            <div className="flex items-center justify-between text-[9px] text-slate-400 font-semibold mb-0.5">
+                            <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 font-semibold mb-0.5">
                               <span>{prod.brand}</span>
                               <span className="text-[#E31B23] font-bold">{prod.category}</span>
                             </div>
 
-                            <h3 className="text-xs font-black text-slate-900 line-clamp-1 leading-snug group-hover:text-[#E31B23] transition-colors">
+                            <h3 className="text-xs sm:text-sm font-black text-slate-900 line-clamp-2 leading-snug group-hover:text-[#E31B23] transition-colors">
                               {prod.name}
                             </h3>
                           </div>
 
-                          <div className="pt-1.5 border-t border-slate-100 space-y-1.5">
+                          <div className="pt-2 border-t border-slate-100 space-y-2">
                             <div className="flex items-baseline justify-between">
                               <div className="flex items-baseline gap-1">
-                                <span className="text-xs sm:text-sm font-black text-slate-900">
+                                <span className="text-sm font-black text-slate-900">
                                   ₹{discInfo.finalPrice.toLocaleString('en-IN')}
                                 </span>
                                 {discInfo.hasDiscount && (
-                                  <span className="text-[9px] text-slate-400 line-through font-medium">
+                                  <span className="text-[10px] text-slate-400 line-through font-medium">
                                     ₹{discInfo.originalPrice.toLocaleString('en-IN')}
                                   </span>
                                 )}
@@ -321,11 +305,11 @@ export const SportsCategoryCarousel: React.FC<SportsCategoryCarouselProps> = ({
 
                               <div>
                                 {isOutOfStock ? (
-                                  <span className="text-[8px] font-bold text-red-600 bg-red-50 px-1 py-0.5 rounded">Out</span>
+                                  <span className="text-[8px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Out</span>
                                 ) : isLowStock ? (
-                                  <span className="text-[8px] font-bold text-amber-700 bg-amber-50 px-1 py-0.5 rounded">Low</span>
+                                  <span className="text-[8px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Low</span>
                                 ) : (
-                                  <span className="text-[8px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">In Stock</span>
+                                  <span className="text-[8px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">In Stock</span>
                                 )}
                               </div>
                             </div>
@@ -336,13 +320,13 @@ export const SportsCategoryCarousel: React.FC<SportsCategoryCarouselProps> = ({
                                 onAddToCart(prod, 1, e);
                               }}
                               disabled={isOutOfStock}
-                              className={`w-full py-1 px-2 rounded-lg font-black text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                              className={`w-full py-1.5 sm:py-2 px-3 rounded-xl font-black text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                                 isOutOfStock
                                   ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                   : 'bg-[#E31B23] hover:bg-[#B5121B] text-white shadow-2xs'
                               }`}
                             >
-                              <ShoppingBag className="w-3 h-3" />
+                              <ShoppingBag className="w-3.5 h-3.5" />
                               <span>{isOutOfStock ? 'Sold Out' : 'Add to Cart'}</span>
                             </button>
                           </div>
