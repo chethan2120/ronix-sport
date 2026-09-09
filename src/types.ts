@@ -40,6 +40,7 @@ export interface Product {
   category: 'Bats' | 'Balls' | 'Helmets' | 'Gloves' | 'Pads' | 'Bags' | 'Accessories' | 'Footwear' | 'Cricket' | 'Football' | 'Badminton' | 'Basketball' | 'Fitness' | string;
   brand: string;
   image: string;
+  image_url?: string;
   description: string;
   costPrice: number;
   retailPrice: number;

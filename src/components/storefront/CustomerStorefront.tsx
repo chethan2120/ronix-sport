@@ -31,23 +31,6 @@ import { ProductDetailPage } from './ProductDetailPage';
 import { CartDrawer, CartItemType } from './CartDrawer';
 import { CheckoutModal } from './CheckoutModal';
 import { getTypesForCategory } from '../../data/productTypes';
-import {
-  HeroSportsComposition,
-  CricketSlideSVG,
-  FootballSlideSVG,
-  FitnessSlideSVG,
-  CricketCategorySVG,
-  FootballCategorySVG,
-  BadmintonCategorySVG,
-  TableTennisCategorySVG,
-  VolleyballCategorySVG,
-  BasketballCategorySVG,
-  FitnessCategorySVG,
-  SportswearCategorySVG,
-  CricketKitPromoSVG,
-  FootballPromoSVG,
-  FitnessPromoSVG,
-} from './SportsIllustrations';
 
 interface CustomerStorefrontProps {
   onBackToCRM?: () => void;
@@ -96,7 +79,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
       subtext: 'Cricket, Football, Badminton, Fitness & more.',
       cta: 'Shop Now',
       category: 'All Gear',
-      SvgComponent: HeroSportsComposition,
+      image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&auto=format&fit=crop&q=80',
       bg: 'bg-gradient-to-r from-[#111827] via-[#990B11] to-[#E31B23]',
     },
     {
@@ -105,7 +88,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
       subtext: 'English Willow Bats • Match Leather Balls • Protective Gear',
       cta: 'Shop Cricket',
       category: 'Cricket',
-      SvgComponent: CricketSlideSVG,
+      image: 'https://images.unsplash.com/photo-1629218079858-6a75f8502f69?w=800&auto=format&fit=crop&q=80',
       bg: 'bg-gradient-to-r from-[#1E293B] via-[#7F1D1D] to-[#E31B23]',
     },
     {
@@ -114,7 +97,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
       subtext: 'Pro Match Balls • Turf Studs • Training Accessories',
       cta: 'Shop Football',
       category: 'Football',
-      SvgComponent: FootballSlideSVG,
+      image: 'https://images.unsplash.com/photo-1614632537190-23e4146777db?w=800&auto=format&fit=crop&q=80',
       bg: 'bg-gradient-to-r from-[#064E3B] via-[#0F766E] to-[#0284C7]',
     },
     {
@@ -123,7 +106,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
       subtext: 'Hex Dumbbells • Kettlebells • Mats • Resistance Gear',
       cta: 'Shop Fitness',
       category: 'Fitness & Gym',
-      SvgComponent: FitnessSlideSVG,
+      image: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&auto=format&fit=crop&q=80',
       bg: 'bg-gradient-to-r from-[#1E1B4B] via-[#4338CA] to-[#0EA5E9]',
     },
   ];
@@ -185,16 +168,16 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
     return Object.values(cart).reduce((acc, qty) => acc + qty, 0);
   }, [cart]);
 
-  // Categories definition with custom SVGs
+  // Categories definition with raster product photos
   const categoriesList = [
-    { name: 'Cricket', count: 12, desc: 'Bats, Balls & Protection', Svg: CricketCategorySVG, bgTint: 'bg-red-50/60' },
-    { name: 'Football', count: 8, desc: 'Balls, Studs & Training', Svg: FootballCategorySVG, bgTint: 'bg-emerald-50/60' },
-    { name: 'Badminton', count: 7, desc: 'Rackets, Shuttles & Grips', Svg: BadmintonCategorySVG, bgTint: 'bg-sky-50/60' },
-    { name: 'Table Tennis', count: 4, desc: 'Bats, Balls & Nets', Svg: TableTennisCategorySVG, bgTint: 'bg-amber-50/60' },
-    { name: 'Volleyball', count: 2, desc: 'Match Balls & Nets', Svg: VolleyballCategorySVG, bgTint: 'bg-blue-50/60' },
-    { name: 'Basketball', count: 3, desc: 'Balls, Shoes & Hoops', Svg: BasketballCategorySVG, bgTint: 'bg-orange-50/60' },
-    { name: 'Fitness & Gym', count: 8, desc: 'Weights, Mats & Bands', Svg: FitnessCategorySVG, bgTint: 'bg-indigo-50/60' },
-    { name: 'Sportswear & Accessories', count: 6, desc: 'Apparel, Shoes & Bags', Svg: SportswearCategorySVG, bgTint: 'bg-purple-50/60' },
+    { name: 'Cricket', count: 12, desc: 'Bats, Balls & Protection', image: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-red-50/60' },
+    { name: 'Football', count: 8, desc: 'Balls, Studs & Training', image: 'https://images.unsplash.com/photo-1614632537190-23e4146777db?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-emerald-50/60' },
+    { name: 'Badminton', count: 7, desc: 'Rackets, Shuttles & Grips', image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-sky-50/60' },
+    { name: 'Table Tennis', count: 4, desc: 'Bats, Balls & Nets', image: 'https://images.unsplash.com/photo-1534158914592-062992fbe900?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-amber-50/60' },
+    { name: 'Volleyball', count: 2, desc: 'Match Balls & Nets', image: 'https://images.unsplash.com/photo-1592656094267-764a45160876?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-blue-50/60' },
+    { name: 'Basketball', count: 3, desc: 'Balls, Shoes & Hoops', image: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-orange-50/60' },
+    { name: 'Fitness & Gym', count: 8, desc: 'Weights, Mats & Bands', image: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-indigo-50/60' },
+    { name: 'Sportswear & Accessories', count: 6, desc: 'Apparel, Shoes & Bags', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&auto=format&fit=crop&q=80', bgTint: 'bg-purple-50/60' },
   ];
 
   // Dynamic Filtering
@@ -337,7 +320,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
 
           {/* Product Image */}
           <ProductImage
-            src={prod.image}
+            src={prod.image_url || prod.image}
             alt={prod.name}
             category={prod.category}
             name={prod.name}
@@ -673,9 +656,15 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   </div>
                 </div>
 
-                {/* Right SVG Artwork Column */}
+                {/* Right Photo Artwork Column */}
                 <div className="lg:col-span-5 hidden lg:flex items-center justify-center p-2 h-[260px] sm:h-[300px]">
-                  {React.createElement(heroSlides[heroIndex].SvgComponent, { className: "w-full h-full object-contain filter drop-shadow-2xl animate-in fade-in zoom-in duration-300" })}
+                  <img
+                    src={heroSlides[heroIndex].image}
+                    alt={heroSlides[heroIndex].headline}
+                    className="w-full h-full object-contain filter drop-shadow-2xl rounded-2xl"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
               </div>
 
@@ -733,8 +722,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   className={`group relative rounded-2xl p-4 sm:p-5 border border-slate-200/80 ${cat.bgTint} hover:bg-white hover:border-[#E31B23] hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between h-[180px] transform hover:-translate-y-1`}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white p-2 border border-slate-200/60 shadow-xs flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <cat.Svg />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white p-1 border border-slate-200/60 shadow-xs flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform">
+                      <img src={cat.image} alt={cat.name} className="w-full h-full object-contain" loading="lazy" decoding="async" />
                     </div>
                     <span className="text-[10px] font-black text-slate-400 bg-white/80 px-2 py-0.5 rounded-full border border-slate-200">
                       {cat.count} Items
@@ -777,7 +766,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   </div>
                 </div>
                 <div className="absolute -right-4 -bottom-4 w-40 h-36 opacity-90 group-hover:scale-110 transition-transform">
-                  <CricketKitPromoSVG />
+                  <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&auto=format&fit=crop&q=80" alt="Cricket Kit" className="w-full h-full object-contain rounded-2xl" loading="lazy" decoding="async" />
                 </div>
               </div>
 
@@ -797,7 +786,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   </div>
                 </div>
                 <div className="absolute -right-4 -bottom-4 w-40 h-36 opacity-90 group-hover:scale-110 transition-transform">
-                  <FootballPromoSVG />
+                  <img src="https://images.unsplash.com/photo-1614632537190-23e4146777db?w=400&auto=format&fit=crop&q=80" alt="Football Pack" className="w-full h-full object-contain rounded-2xl" loading="lazy" decoding="async" />
                 </div>
               </div>
 
@@ -817,7 +806,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   </div>
                 </div>
                 <div className="absolute -right-4 -bottom-4 w-40 h-36 opacity-90 group-hover:scale-110 transition-transform">
-                  <FitnessPromoSVG />
+                  <img src="https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&auto=format&fit=crop&q=80" alt="Home Gym Setup" className="w-full h-full object-contain rounded-2xl" loading="lazy" decoding="async" />
                 </div>
               </div>
             </div>

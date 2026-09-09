@@ -22,8 +22,8 @@ export const PRODUCT_ASSETS: Record<string, string> = {
   'FTB-GLV-016': 'https://images.unsplash.com/photo-1608245449230-4ac19066d210?w=600&auto=format&fit=crop&q=80',
   'FTB-SHO-017': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80',
   'FTB-CON-018': 'https://images.unsplash.com/photo-1526676037777-05a232554f77?w=600&auto=format&fit=crop&q=80',
-  'FTB-PMP-019': 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&auto=format&fit=crop&q=80',
-  'FTB-ARM-020': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
+  'FTB-PMP-019': 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&auto=format&fit=crop&q=80',
+  'FTB-ARM-020': 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&auto=format&fit=crop&q=80',
 
   // Badminton SKUs
   'BAD-RCT-021': 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&auto=format&fit=crop&q=80',
@@ -31,18 +31,18 @@ export const PRODUCT_ASSETS: Record<string, string> = {
   'BAD-SHT-023': 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=600&auto=format&fit=crop&q=80',
   'BAD-SHT-024': 'https://images.unsplash.com/photo-1521537634581-0ddea2f34840?w=600&auto=format&fit=crop&q=80',
   'BAD-SHO-025': 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&auto=format&fit=crop&q=80',
-  'BAD-GRP-026': 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&auto=format&fit=crop&q=80',
+  'BAD-GRP-026': 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600&auto=format&fit=crop&q=80',
   'BAD-NET-027': 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=600&auto=format&fit=crop&q=80',
 
   // Table Tennis SKUs
   'TT-BAT-028': 'https://images.unsplash.com/photo-1534158914592-062992fbe900?w=600&auto=format&fit=crop&q=80',
   'TT-BAL-029': 'https://images.unsplash.com/photo-1611251100435-d22501a35564?w=600&auto=format&fit=crop&q=80',
   'TT-NET-030': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&auto=format&fit=crop&q=80',
-  'TT-CAS-031': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80',
+  'TT-CAS-031': 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&auto=format&fit=crop&q=80',
 
   // Volleyball SKUs
-  'VLB-BAL-032': 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=600&auto=format&fit=crop&q=80',
-  'VLB-KNE-033': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
+  'VLB-BAL-032': 'https://images.unsplash.com/photo-1592656094267-764a45160876?w=600&auto=format&fit=crop&q=80',
+  'VLB-KNE-033': 'https://images.unsplash.com/photo-1562077772-3bd90403f7f0?w=600&auto=format&fit=crop&q=80',
 
   // Basketball SKUs
   'BSK-BAL-034': 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=600&auto=format&fit=crop&q=80',
@@ -54,16 +54,16 @@ export const PRODUCT_ASSETS: Record<string, string> = {
   'FIT-KTB-038': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
   'FIT-MAT-039': 'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=600&auto=format&fit=crop&q=80',
   'FIT-BND-040': 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=600&auto=format&fit=crop&q=80',
-  'FIT-ROL-041': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&auto=format&fit=crop&q=80',
-  'FIT-ROP-042': 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=600&auto=format&fit=crop&q=80',
-  'FIT-FOM-043': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&auto=format&fit=crop&q=80',
-  'FIT-GRP-044': 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&auto=format&fit=crop&q=80',
+  'FIT-ROL-041': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&auto=format&fit=crop&q=80',
+  'FIT-ROP-042': 'https://images.unsplash.com/photo-1514994667787-b48ca3da154f?w=600&auto=format&fit=crop&q=80',
+  'FIT-FOM-043': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&auto=format&fit=crop&q=80',
+  'FIT-GRP-044': 'https://images.unsplash.com/photo-1591940742878-13aba4b7a34e?w=600&auto=format&fit=crop&q=80',
 
   // Sportswear SKUs
   'SPW-TSH-045': 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80',
   'SPW-PNT-046': 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=600&auto=format&fit=crop&q=80',
   'SPW-SOK-047': 'https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=600&auto=format&fit=crop&q=80',
-  'SPW-WRT-048': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
+  'SPW-WRT-048': 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&auto=format&fit=crop&q=80',
   'SPW-BAG-049': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80',
   'SPW-BTL-050': 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&auto=format&fit=crop&q=80',
 };

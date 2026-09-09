@@ -91,9 +91,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               </span>
             )}
             <ProductImage
-              src={product.image}
+              src={product.image_url || product.image}
               alt={product.name}
               category={product.category}
+              product={product}
               className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
             />
           </div>
@@ -101,9 +102,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           <div className="flex items-center space-x-3">
             <div className="w-20 h-20 rounded-xl bg-slate-50 border-2 border-[#E31B23] p-1.5 flex items-center justify-center">
               <ProductImage
-                src={product.image}
+                src={product.image_url || product.image}
                 alt={product.name}
                 category={product.category}
+                product={product}
                 className="w-full h-full object-contain"
               />
             </div>

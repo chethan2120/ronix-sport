@@ -305,11 +305,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const loaded: Product[] = saved ? JSON.parse(saved) : tagWithDemo(INITIAL_PRODUCTS);
     return loaded.map((p) => {
       const sanitized = sanitizeProduct(p);
-      const asset = getSkuProductAsset(sanitized.sku, sanitized.category, sanitized.name, sanitized.productType);
-      if (asset && (!sanitized.image || sanitized.image.includes('unsplash.com'))) {
-        return { ...sanitized, image: asset };
-      }
-      return sanitized;
+      const skuAsset = getSkuProductAsset(sanitized.sku, sanitized.category, sanitized.name, sanitized.productType);
+      const imgUrl = skuAsset || (sanitized as any).image_url || sanitized.image || RASTER_FALLBACK_IMAGE;
+      return {
+        ...sanitized,
+        image_url: imgUrl,
+        image: imgUrl,
+      };
     });
   });
 

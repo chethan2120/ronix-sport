@@ -128,6 +128,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClos
       b2bPrice: Number(formData.b2bPrice),
       minStockLevel: Number(formData.minStockLevel),
       image: formData.image || imagePreview,
+      image_url: formData.image || imagePreview,
       hsnCode: '9506.99',
       gstPercent: 18,
       status: 'Active',

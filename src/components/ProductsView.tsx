@@ -145,6 +145,7 @@ export const ProductsView: React.FC<ProductsViewProps> = ({
       category: finalCategory,
       productType: editFormData.productType || editingProduct.productType,
       image: editFormData.image !== undefined ? editFormData.image : editingProduct.image,
+      image_url: editFormData.image !== undefined ? editFormData.image : (editingProduct.image_url || editingProduct.image),
       discountType: dType,
       discountValue: dVal,
       discountStartDate: editFormData.discountStartDate || null,

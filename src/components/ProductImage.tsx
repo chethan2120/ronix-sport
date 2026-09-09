@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Package } from 'lucide-react';
 import { Product } from '../types';
 import { getSkuProductAsset, RASTER_FALLBACK_IMAGE } from '../data/productAssets';
 
@@ -23,35 +22,34 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   name,
   product,
 }) => {
-  const rawSrc =
-    src ||
-    product?.image ||
-    (product as any)?.imageUrl ||
-    (product as any)?.image_url ||
-    (product as any)?.productImage ||
-    (product as any)?.thumbnail ||
-    (product as any)?.photo;
-
   const sku = product?.sku || (product as any)?.SKU || '';
   const prodCat = category || product?.category || '';
   const prodName = name || product?.name || '';
 
-  // Get primary SKU raster image asset or fallback
   const skuAsset = getSkuProductAsset(sku, prodCat);
 
-  // Resolution order: rawSrc > skuAsset > RASTER_FALLBACK_IMAGE
-  const initialImageSrc = rawSrc || skuAsset || RASTER_FALLBACK_IMAGE;
+  const rawSrc =
+    (product as any)?.image_url ||
+    src ||
+    product?.image ||
+    (product as any)?.imageUrl ||
+    (product as any)?.productImage ||
+    (product as any)?.thumbnail ||
+    (product as any)?.photo ||
+    skuAsset;
+
+  const initialImageSrc = rawSrc || RASTER_FALLBACK_IMAGE;
 
   const [currentSrc, setCurrentSrc] = useState<string>(initialImageSrc);
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const newSrc = rawSrc || skuAsset || RASTER_FALLBACK_IMAGE;
+    const newSrc = rawSrc || RASTER_FALLBACK_IMAGE;
     setCurrentSrc(newSrc);
     setHasError(false);
     setIsLoaded(false);
-  }, [rawSrc, sku, skuAsset]);
+  }, [rawSrc]);
 
   const handleError = () => {
     if (!hasError) {
@@ -67,9 +65,7 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   return (
     <div className={`relative w-full h-full flex items-center justify-center overflow-hidden rounded-xl bg-white p-1 ${fallbackClassName || ''}`}>
       {!isLoaded && (
-        <div className="absolute inset-0 bg-slate-50 animate-pulse flex items-center justify-center rounded-xl">
-          <Package className="w-5 h-5 text-slate-300" />
-        </div>
+        <div className="absolute inset-0 bg-slate-100 animate-pulse rounded-xl" />
       )}
       <img
         src={currentSrc}
@@ -78,6 +74,7 @@ export const ProductImage: React.FC<ProductImageProps> = ({
         onError={handleError}
         onLoad={() => setIsLoaded(true)}
         loading="lazy"
+        decoding="async"
       />
     </div>
   );
