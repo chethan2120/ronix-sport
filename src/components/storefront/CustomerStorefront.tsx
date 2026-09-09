@@ -41,6 +41,7 @@ import { ProductDetailPage } from './ProductDetailPage';
 import { CartDrawer, CartItemType } from './CartDrawer';
 import { CheckoutModal } from './CheckoutModal';
 import { getTypesForCategory } from '../../data/productTypes';
+import { SportsCategoryCarousel, CategorySlideData } from '../ui/sports-category-carousel';
 
 interface CustomerStorefrontProps {
   onBackToCRM?: () => void;
@@ -309,7 +310,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const bookSlides = useMemo(() => [
+  const bookSlides = useMemo<CategorySlideData[]>(() => [
     {
       id: 'football',
       title: 'FOOTBALL FAVORITES',
@@ -317,42 +318,46 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
       badge: 'MATCH READY GEAR',
       desc: 'Match-ready footballs, stud shoes, goalkeeper gloves, and agility training gear.',
       products: footballSectionProducts.slice(0, 6),
-      bgTint: 'bg-emerald-50/70 border-emerald-200/80',
-      badgeStyle: 'text-emerald-800 bg-emerald-100',
+      bgTint: 'bg-emerald-50/70',
+      badgeStyle: 'text-emerald-800 bg-emerald-100 border-emerald-300',
       buttonStyle: 'bg-emerald-700 hover:bg-emerald-800 text-white',
+      accentBorder: 'border-emerald-200/90',
     },
     {
       id: 'badminton',
       title: 'BADMINTON ESSENTIALS',
       category: 'Badminton',
       badge: 'PRO PERFORMANCE',
-      desc: 'Tournament-grade rackets, nylon & feather shuttlecocks, court shoes, and kit bags.',
+      desc: 'Rackets, shuttlecocks, grips, nets, and training accessories for every rally.',
       products: badmintonSectionProducts.slice(0, 6),
-      bgTint: 'bg-sky-50/70 border-sky-200/80',
-      badgeStyle: 'text-sky-800 bg-sky-100',
+      bgTint: 'bg-sky-50/70',
+      badgeStyle: 'text-sky-800 bg-sky-100 border-sky-300',
       buttonStyle: 'bg-sky-700 hover:bg-sky-800 text-white',
+      accentBorder: 'border-sky-200/90',
     },
     {
       id: 'fitness',
       title: 'FITNESS & GYM GEAR',
       category: 'Fitness & Gym',
       badge: 'WORKOUT READY',
-      desc: 'Hex dumbbells, resistance bands, non-slip yoga mats, and gym accessories.',
+      desc: 'Dumbbells, resistance bands, mats, and essential home workout equipment.',
       products: fitnessSectionProducts.slice(0, 6),
-      bgTint: 'bg-indigo-50/70 border-indigo-200/80',
-      badgeStyle: 'text-indigo-800 bg-indigo-100',
+      bgTint: 'bg-indigo-50/70',
+      badgeStyle: 'text-indigo-800 bg-indigo-100 border-indigo-300',
       buttonStyle: 'bg-indigo-700 hover:bg-indigo-800 text-white',
+      accentBorder: 'border-indigo-200/90',
     },
     {
       id: 'sportswear',
       title: 'SPORTSWEAR & ACCESSORIES',
       category: 'Sportswear & Accessories',
       badge: 'ATHLETIC WEAR & GEAR',
-      desc: 'Quick-dry training t-shirts, track pants, sports caps, cushioned socks, and duffel bags.',
+      desc: 'Performance apparel, kit bags, socks, caps, and everyday sports essentials.',
       products: sportswearSectionProducts.slice(0, 6),
-      bgTint: 'bg-purple-50/70 border-purple-200/80',
-      badgeStyle: 'text-purple-800 bg-purple-100',
+      bgTint: 'bg-purple-50/70',
+      badgeStyle: 'text-purple-800 bg-purple-100 border-purple-300',
       buttonStyle: 'bg-purple-700 hover:bg-purple-800 text-white',
+      accentBorder: 'border-purple-200/90',
     },
   ], [footballSectionProducts, badmintonSectionProducts, fitnessSectionProducts, sportswearSectionProducts]);
 
@@ -1088,83 +1093,19 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
             </div>
           </section>
 
-          {/* SPORTS CATALOGUE BOOK-STYLE SLIDER SECTION */}
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div
-              onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
-              onTouchEnd={(e) => {
-                const touchEndX = e.changedTouches[0].clientX;
-                if (touchStartX - touchEndX > 50) {
-                  setBookSlideIndex((prev) => (prev < bookSlides.length - 1 ? prev + 1 : 0));
-                } else if (touchEndX - touchStartX > 50) {
-                  setBookSlideIndex((prev) => (prev > 0 ? prev - 1 : bookSlides.length - 1));
-                }
-              }}
-              className={`rounded-3xl border p-6 sm:p-8 space-y-6 transition-all duration-500 shadow-md ${bookSlides[bookSlideIndex].bgTint}`}
-            >
-              {/* Top Header & Page Controls */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
-                <div>
-                  <div className="flex items-center space-x-2 mb-1">
-                    <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full ${bookSlides[bookSlideIndex].badgeStyle}`}>
-                      {bookSlides[bookSlideIndex].badge}
-                    </span>
-                    <span className="text-xs font-bold text-slate-500">
-                      Page {bookSlideIndex + 1} of {bookSlides.length}
-                    </span>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                    {bookSlides[bookSlideIndex].title}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
-                    {bookSlides[bookSlideIndex].desc}
-                  </p>
-                </div>
-
-                <div className="flex items-center space-x-3 shrink-0">
-                  <button
-                    onClick={() => setBookSlideIndex((prev) => (prev > 0 ? prev - 1 : bookSlides.length - 1))}
-                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
-                    title="Previous Catalogue Page"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-
-                  <div className="flex items-center space-x-1.5 px-2">
-                    {bookSlides.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setBookSlideIndex(i)}
-                        className={`h-2.5 rounded-full transition-all cursor-pointer ${
-                          bookSlideIndex === i ? 'bg-[#E31B23] w-7' : 'bg-slate-300 hover:bg-slate-400 w-2.5'
-                        }`}
-                      />
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => setBookSlideIndex((prev) => (prev < bookSlides.length - 1 ? prev + 1 : 0))}
-                    className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
-                    title="Next Catalogue Page"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-
-                  <button
-                    onClick={() => handleSelectCategory(bookSlides[bookSlideIndex].category)}
-                    className={`px-4 py-2.5 rounded-xl font-black text-xs transition-all shadow-xs cursor-pointer ${bookSlides[bookSlideIndex].buttonStyle}`}
-                  >
-                    View All {bookSlides[bookSlideIndex].category} &rarr;
-                  </button>
-                </div>
-              </div>
-
-              {/* Slide Content Grid */}
-              <div className="animate-in fade-in duration-300">
-                {renderProductSectionGrid(bookSlides[bookSlideIndex].products)}
-              </div>
-            </div>
-          </section>
+          {/* MATCH READY GEAR CATEGORY CAROUSEL */}
+          <SportsCategoryCarousel
+            slides={bookSlides}
+            onSelectCategory={handleSelectCategory}
+            onSelectProduct={(prod) => {
+              setSelectedProduct(prod);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onAddToCart={handleAddToCart}
+            inventory={inventory}
+            wishlist={wishlist}
+            onToggleWishlist={toggleWishlist}
+          />
 
           {/* SHOP BY NEED SECTION */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
