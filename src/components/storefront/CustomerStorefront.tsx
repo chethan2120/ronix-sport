@@ -1198,7 +1198,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({ onBackTo
                   </p>
                 </div>
 
-                {renderProductSectionGrid(activeDiscountDeals.slice(0, 4))}
+                {renderProductSectionGrid(activeDiscountDeals)}
               </div>
             </section>
           )}

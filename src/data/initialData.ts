@@ -346,6 +346,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     mrp: 2499,
     rating: 4.7,
     reviewsCount: 61,
+    discountType: 'flat',
+    discountValue: 300,
   },
   {
     id: 'prod-foo-003',
